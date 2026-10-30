@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <title>2048 Multi Mode</title>
+  <style>
+    :root {
+      --bg-1: #f6f1ff;
+      --bg-2: #e9eeff;
+      --panel: rgba(255,255,255,0.72);
+      --panel-strong: rgba(255,255,255,0.9);
+      --text: #2e3852;
+      --muted: #69748d;
+      --accent: #7a6af6;
+      --accent-2: #53c7c2;
+      --danger: #ff6d7c;
+      --board-bg: #bcaee6;
+      --cell-bg: rgba(255,255,255,0.38);
+      --shadow: 0 16px 40px rgba(63, 58, 107, 0.15);
+      --tile-empty: rgba(255,255,255,0.18);
+      --tile-2: #faf7ff;
+      --tile-4: #efeefb;
+      --tile-8: #f6d9a9;
+      --tile-16: #f9c98a;
+      --tile-32: #faaf66;
+      --tile-64: #ff8d60;
+      --tile-128: #f3d760;
+      --tile-256: #e6c640;
+      --tile-512: #d8ac4b;
+      --tile-1024: #a07ae9;
+      --tile-2048: #7a6af6;
+      --tile-4096: #44b295;
+      --tile-8192: #2eb0d6;
+      --tile-16384: #d772ff;
+      --tile-32768: #ff4d79;
+      --tile-65536: #1d1f34;
+      --font: "Segoe UI", "PingFang TC","Microsoft JhengHei","Noto Sans TC","Arial",sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overscroll-behavior: none;
+      overflow: hidden;
+      touch-action: none;
+      background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+      color: var(--text);
+      font-family: var(--font);
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(10px, 2vh, 24px);
+    }
+
+    #app {
+      width: min(100%, 560px);
+      min-height: min(92vh, 900px);
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 18px 18px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 52px;
+    }
+
+    .brand {
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      font-size: clamp(1.5rem, 2vw, 2rem);
+      color: var(--text);
+    }
+
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill, button, select, input {
+      font: inherit;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.45);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    select, input[type="color"] {
+      border: 1px solid rgba(140,146,180,0.3);
+      background: rgba(255,255,255,0.8);
+      border-radius: 12px;
+      color: var(--text);
+      padding: 8px 10px;
+      outline: none;
+    }
+
+    select {
+      min-width: 118px;
+      appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+        linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+      background-position:
+        calc(100% - 18px) calc(50% - 2px),
+        calc(100% - 12px) calc(50% - 2px);
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+      padding-right: 32px;
+    }
+
+    input[type="color"] {
+      width: 42px;
+      height: 38px;
+      padding: 4px;
+      min-width: 42px;
+      cursor: pointer;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    .toolbar .action-btn, .primary-btn, .secondary-btn, .icon-btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.2s ease;
+      box-shadow: 0 8px 18px rgba(64, 60, 97, 0.1);
+    }
+
+    .action-btn, .secondary-btn {
+      background: rgba(255,255,255,0.5);
+      color: var(--text);
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      background: rgba(255,255,255,0.56);
+      color: var(--text);
+      padding: 0;
+    }
+
+    button:active, .icon-btn:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .status-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .score-box {
+      background: rgba(255,255,255,0.45);
+      border-radius: 16px;
+      padding: 10px 12px;
+      text-align: center;
+      border: 1px solid rgba(153,160,196,0.22);
+    }
+
+    .score-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .score-value {
+      display: block;
+      margin-top: 4px;
+      font-size: clamp(1.1rem, 2vw, 1.7rem);
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .board-shell {
+      background: rgba(255,255,255,0.3);
+      border-radius: 26px;
+      padding: 12px;
+      border: 1px solid rgba(150,157,194,0.15);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+
+    .board {
+      position: relative;
+      display: grid;
+      gap: 10px;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: var(--board-bg);
+      border-radius: 18px;
+      padding: 10px;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .cell {
+      position: relative;
+      border-radius: 12px;
+      background: var(--cell-bg);
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .tile {
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: rgba(30,35,48,0.82);
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.08), 0 4px 12px rgba(30, 35, 48, 0.08);
+      animation: popIn 0.18s ease-out;
+      transition: transform 0.14s ease, filter 0.15s ease, opacity 0.15s ease;
+    }
+
+    .tile[data-value="2"], .tile[data-value="4"] {
+      color: rgba(52,57,73,0.9);
+    }
+
+    .tile[data-value="128"], .tile[data-value="256"], .tile[data-value="512"], .tile[data-value="1024"], .tile[data-value="2048"], .tile[data-value="4096"], .tile[data-value="8192"], .tile[data-value="16384"], .tile[data-value="32768"], .tile[data-value="65536"] {
+      color: rgba(255,255,255,0.95);
+    }
+
+    .tile[data-value="65536"] {
+      font-size: clamp(0.7rem, 2vw, 1rem);
+    }
+
+    .tile[data-value="32768"], .tile[data-value="16384"] {
+      font-size: clamp(0.8rem, 2vw, 1.2rem);
+    }
+
+    .tile[data-value="1024"], .tile[data-value="2048"], .tile[data-value="4096"], .tile[data-value="8192"] {
+      font-size: clamp(0.9rem, 2vw, 1.35rem);
+    }
+
+    .tile[data-value="512"] {
+      font-size: clamp(0.95rem, 2vw, 1.4rem);
+    }
+
+    .tile[data-value="128"], .tile[data-value="256"] {
+      font-size: clamp(1rem, 2vw, 1.6rem);
+    }
+
+    .tile[data-value="32"], .tile[data-value="64"] {
+      font-size: clamp(1.05rem, 2vw, 1.65rem);
+    }
+
+    .tile[data-value="8"], .tile[data-value="16"] {
+      font-size: clamp(1.15rem, 2vw, 1.7rem);
+    }
+
+    .tile[data-value="2"], .tile[data-value="4"] {
+      font-size: clamp(1.25rem, 2vw, 1.8rem);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.7); opacity: 0; }
+      70% { transform: scale(1.06); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .tile.merged {
+      animation: mergePulse 0.2s ease-out;
+    }
+
+    @keyframes mergePulse {
+      0% { transform: scale(1); filter: brightness(1); }
+      50% { transform: scale(1.08); filter: brightness(1.1); }
+      100% { transform: scale(1); filter: brightness(1); }
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%) translateY(8px);
+      max-width: min(80vw, 420px);
+      background: rgba(33,36,52,0.9);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      box-shadow: 0 12px 24px rgba(20, 20, 36, 0.16);
+      z-index: 60;
+    }
+
+    .toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 20, 32, 0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 80;
+      opacity: 1;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .modal {
+      width: min(100%, 520px);
+      background: rgba(255,255,255,0.94);
+      color: var(--text);
+      border-radius: 24px;
+      padding: 18px 16px 16px;
+      box-shadow: 0 18px 52px rgba(21, 22, 36, 0.22);
+      border: 1px solid rgba(160,168,204,0.35);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 8px;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .save-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .save-card {
+      background: rgba(245,246,255,0.9);
+      border: 1px solid rgba(160,168,204,0.25);
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .save-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .save-meta strong {
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .save-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .save-actions button {
+      flex: 1;
+      border: none;
+      border-radius: 10px;
+      font-weight: 800;
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+
+    .save-actions .save-slot {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+    }
+
+    .save-actions .load-slot {
+      background: rgba(255,255,255,0.7);
+      color: var(--text);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 560px) {
+      #app {
+        width: 100%;
+        min-height: 100%;
+        border-radius: 0;
+        padding: 14px 12px 14px;
+      }
+
+      .topbar, .toolbar {
+        align-items: stretch;
+      }
+
+      .toolbar {
+        gap: 8px;
+      }
+
+      .toolbar-group {
+        width: 100%;
+      }
+
+      .top-controls {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .action-btn, .primary-btn, .secondary-btn, .icon-btn {
+        flex: 1;
+      }
+
+      .board-shell {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="topbar">
+      <div class="brand" data-text="title">2048</div>
+      <div class="top-controls">
+        <div class="pill" id="themeLabel" data-text="colors">Theme</div>
+        <input id="themeBgInput" type="color" aria-label="Background color" />
+        <input id="themePanelInput" type="color" aria-label="Panel color" />
+        <input id="themeAccentInput" type="color" aria-label="Accent color" />
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <label class="pill" data-text="mode">Mode</label>
+        <select id="modeSelect" aria-label="Game mode">
+          <option value="classic" data-text="classic">Classic 2048</option>
+          <option value="challenge" data-text="challenge">Challenge 4096</option>
+          <option value="custom" data-text="custom">Custom</option>
+        </select>
+
+        <div id="customSettings" class="toolbar-group hidden">
+          <label class="pill" data-text="boardSize">Board</label>
+          <select id="customSizeSelect">
+            <option value="4">4 x 4</option>
+            <option value="5">5 x 5</option>
+            <option value="6">6 x 6</option>
+          </select>
+          <label class="pill" data-text="target">Target</label>
+          <select id="customTargetSelect">
+            <option value="1024">1024</option>
+            <option value="2048">2048</option>
+            <option value="4096" selected>4096</option>
+            <option value="8192">8192</option>
+            <option value="16384">16384</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="toolbar-group">
+        <button class="secondary-btn" id="undoBtn" data-text="undo">Undo</button>
+        <button class="secondary-btn" id="restartBtn" data-text="restart">Restart</button>
+        <button class="primary-btn" id="saveBtn" data-text="save">Save</button>
+        <button class="icon-btn" id="fullscreenBtn" title="Full Screen">⛶</button>
+      </div>
+    </div>
+
+    <div class="status-row">
+      <div class="score-box">
+        <span class="score-label" data-text="score">Score</span>
+        <span class="score-value" id="scoreValue">0</span>
+      </div>
+      <div class="score-box">
+        <span class="score-label" data-text="best">Best</span>
+        <span class="score-value" id="bestValue">0</span>
+      </div>
+      <div class="score-box">
+        <span class="score-label" data-text="target">Target</span>
+        <span class="score-value" id="targetValue">2048</span>
+      </div>
+    </div>
+
+    <div class="board-shell">
+      <div class="board" id="board" aria-label="2048 game board"></div>
+    </div>
+
+    <div class="top-controls" style="justify-content:flex-start;">
+      <label class="pill" data-text="language">Language</label>
+      <select id="langSelect">
+        <option value="zh-Hant">繁體中文</option>
+        <option value="zh-CN">简体中文</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="modal-overlay hidden" id="saveModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 data-text="savedGames">Saved Games</h3>
+        <button class="secondary-btn" id="closeSaveModal" data-text="close">Close</button>
+      </div>
+      <div class="save-list" id="saveList"></div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEYS = {
+      best: "2048BestScoreV1",
+      saveSlots: "2048SaveSlotsV1",
+      language: "2048LanguageV1",
+      theme: "2048ThemeV1"
+    };
+
+    const i18n = {
+      "zh-Hant": {
+        title: "2048",
+        colors: "調色系",
+        mode: "玩法",
+        classic: "經典 2048",
+        challenge: "挑戰 4096",
+        custom: "自定義",
+        boardSize: "棋盤大小",
+        target: "目標值",
+        score: "分數",
+        best: "最佳",
+        undo: "回復上一步",
+        restart: "重新開始",
+        save: "存檔",
+        close: "關閉",
+        savedGames: "存檔列表",
+        language: "語言",
+        empty: "空",
+        newSave: "新存檔",
+        load: "讀取",
+        overwrite: "覆蓋",
+        noMoves: "目前不能移動",
+        saved: "已存檔",
+        loaded: "已讀取",
+        won: "已達目標，繼續挑戰更高分！",
+        lost: "遊戲結束，沒有可移動的空間。",
+        restartConfirm: "確定要重新開始嗎？",
+        noHistory: "沒有可回復的步驟",
+        fullscreen: "全螢幕"
+      },
+      "zh-CN": {
+        title: "2048",
+        colors: "调色系",
+        mode: "玩法",
+        classic: "经典 2048",
+        challenge: "挑战 4096",
+        custom: "自定义",
+        boardSize: "棋盘大小",
+        target: "目标值",
+        score: "分数",
+        best: "最佳",
+        undo: "恢复上一步",
+        restart: "重新开始",
+        save: "存档",
+        close: "关闭",
+        savedGames: "存档列表",
+        language: "语言",
+        empty: "空",
+        newSave: "新存档",
+        load: "读取",
+        overwrite: "覆盖",
+        noMoves: "目前不能移动",
+        saved: "已存档",
+        loaded: "已读取",
+        won: "已达目标，继续挑战更高分！",
+        lost: "游戏结束，没有可移动的空间。",
+        restartConfirm: "确定要重新开始吗？",
+        noHistory: "没有可恢复的步骤",
+        fullscreen: "全屏"
+      },
+      en: {
+        title: "2048",
+        colors: "Theme",
+        mode: "Mode",
+        classic: "Classic 2048",
+        challenge: "Challenge 4096",
+        custom: "Custom",
+        boardSize: "Board",
+        target: "Target",
+        score: "Score",
+        best: "Best",
+        undo: "Undo",
+        restart: "Restart",
+        save: "Save",
+        close: "Close",
+        savedGames: "Saved Games",
+        language: "Language",
+        empty: "Empty",
+        newSave: "New Save",
+        load: "Load",
+        overwrite: "Overwrite",
+        noMoves: "No moves available",
+        saved: "Saved",
+        loaded: "Loaded",
+        won: "Goal reached! Keep going!",
+        lost: "No more moves available.",
+        restartConfirm: "Restart the game?",
+        noHistory: "Nothing to undo",
+        fullscreen: "Full Screen"
+      }
+    };
+
+    const DEFAULT_THEME = {
+      bg1: "#f6f1ff",
+      bg2: "#e9eeff",
+      panel: "#ffffff",
+      accent: "#7a6af6"
+    };
+
+    const game = {
+      mode: "classic",
+      size: 4,
+      target: 2048,
+      score: 0,
+      best: 0,
+      board: [],
+      history: [],
+      lang: "zh-Hant",
+      wonOnce: false,
+      state: "playing",
+      theme: { ...DEFAULT_THEME }
+    };
+
+    const els = {};
+    const saveSlots = Array.from({ length: 5 }, (_, i) => `slot-${i + 1}`);
+
+    function init() {
+      cacheElements();
+      initThemeFromStorage();
+      initLanguageFromStorage();
+      bindEvents();
+      applyLanguage();
+      applyTheme();
+      loadBest();
+      startNewGame();
+      renderSaveModal();
+    }
+
+    function cacheElements() {
+      els.modeSelect = document.getElementById("modeSelect");
+      els.customSettings = document.getElementById("customSettings");
+      els.customSizeSelect = document.getElementById("customSizeSelect");
+      els.customTargetSelect = document.getElementById("customTargetSelect");
+      els.undoBtn = document.getElementById("undoBtn");
+      els.restartBtn = document.getElementById("restartBtn");
+      els.saveBtn = document.getElementById("saveBtn");
+      els.fullscreenBtn = document.getElementById("fullscreenBtn");
+      els.langSelect = document.getElementById("langSelect");
+      els.board = document.getElementById("board");
+      els.scoreValue = document.getElementById("scoreValue");
+      els.bestValue = document.getElementById("bestValue");
+      els.targetValue = document.getElementById("targetValue");
+      els.toast = document.getElementById("toast");
+      els.saveModal = document.getElementById("saveModal");
+      els.saveList = document.getElementById("saveList");
+      els.closeSaveModal = document.getElementById("closeSaveModal");
+      els.themeBgInput = document.getElementById("themeBgInput");
+      els.themePanelInput = document.getElementById("themePanelInput");
+      els.themeAccentInput = document.getElementById("themeAccentInput");
+    }
+
+    function bindEvents() {
+      els.modeSelect.addEventListener("change", () => {
+        game.mode = els.modeSelect.value;
+        updateModeSettings();
+        startNewGame();
+      });
+
+      els.customSizeSelect.addEventListener("change", () => {
+        if (game.mode === "custom") {
+          startNewGame();
+        }
+      });
+
+      els.customTargetSelect.addEventListener("change", () => {
+        if (game.mode === "custom") {
+          startNewGame();
+        }
+      });
+
+      els.undoBtn.addEventListener("click", undoMove);
+      els.restartBtn.addEventListener("click", () => {
+        if (confirm(i18n[game.lang].restartConfirm)) {
+          startNewGame();
+        }
+      });
+      els.saveBtn.addEventListener("click", openSaveModal);
+      els.closeSaveModal.addEventListener("click", closeSaveModal);
+
+      els.langSelect.addEventListener("change", () => {
+        game.lang = els.langSelect.value;
+        localStorage.setItem(STORAGE_KEYS.language, game.lang);
+        applyLanguage();
+        renderSaveModal();
+      });
+
+      els.fullscreenBtn.addEventListener("click", toggleFullScreen);
+
+      els.themeBgInput.addEventListener("input", () => {
+        const value = els.themeBgInput.value;
+        const [r, g, b] = hexToRgb(value);
+        const dark = [r, g, b].map(v => Math.max(0, Math.min(255, v - 14))).join(",");
+        document.documentElement.style.setProperty("--bg-1", value);
+        document.documentElement.style.setProperty("--bg-2", `rgb(${dark})`);
+        game.theme.bg1 = value;
+        game.theme.bg2 = `rgb(${dark})`;
+        persistTheme();
+      });
+
+      els.themePanelInput.addEventListener("input", () => {
+        const value = els.themePanelInput.value;
+        document.documentElement.style.setProperty("--panel", value);
+        game.theme.panel = value;
+        persistTheme();
+      });
+
+      els.themeAccentInput.addEventListener("input", () => {
+        const value = els.themeAccentInput.value;
+        document.documentElement.style.setProperty("--accent", value);
+        game.theme.accent = value;
+        persistTheme();
+      });
+
+      document.addEventListener("keydown", handleKeydown);
+
+      document.addEventListener("touchstart", (event) => {
+        const touch = event.changedTouches[0];
+        if (!touch) return;
+        document.__touchStart = { x: touch.clientX, y: touch.clientY };
+      }, { passive: true });
+
+      document.addEventListener("touchend", (event) => {
+        const start = document.__touchStart;
+        if (!start) return;
+        const touch = event.changedTouches[0];
+        if (!touch) return;
+        const dx = touch.clientX - start.x;
+        const dy = touch.clientY - start.y;
+        const absX = Math.abs(dx);
+        const absY = Math.abs(dy);
+
+        if (Math.max(absX, absY) < 28) return;
+
+        if (absX > absY) {
+          move(dx > 0 ? "right" : "left");
+        } else {
+          move(dy > 0 ? "down" : "up");
+        }
+        delete document.__touchStart;
+      }, { passive: true });
+
+      document.addEventListener("click", (event) => {
+        const action = event.target.dataset.action;
+        if (!action) return;
+
+        if (action === "save-slot") {
+          const slot = event.target.dataset.slot;
+          saveGame(slot);
+        }
+
+        if (action === "load-slot") {
+          const slot = event.target.dataset.slot;
+          loadGame(slot);
+        }
+      });
+
+      document.addEventListener("touchmove", (event) => {
+        if (event.cancelable) event.preventDefault();
+      }, { passive: false });
+
+      document.body.addEventListener("touchmove", (event) => {
+        if (event.cancelable) event.preventDefault();
+      }, { passive: false });
+    }
+
+    function hexToRgb(hex) {
+      const clean = hex.replace("#", "");
+      const full = clean.length === 3
+        ? clean.split("").map(ch => ch + ch).join("")
+        : clean;
+      const num = parseInt(full, 16);
+      return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+    }
+
+    function initThemeFromStorage() {
+      const saved = localStorage.getItem(STORAGE_KEYS.theme);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          game.theme = { ...DEFAULT_THEME, ...parsed };
+        } catch (e) {
+          game.theme = { ...DEFAULT_THEME };
+        }
+      }
+    }
+
+    function persistTheme() {
+      localStorage.setItem(STORAGE_KEYS.theme, JSON.stringify(game.theme));
+    }
+
+    function initLanguageFromStorage() {
+      const savedLang = localStorage.getItem(STORAGE_KEYS.language);
+      if (savedLang && i18n[savedLang]) {
+        game.lang = savedLang;
+      }
+    }
+
+    function loadBest() {
+      const best = Number(localStorage.getItem(STORAGE_KEYS.best) || 0);
+      game.best = Number.isFinite(best) ? best : 0;
+    }
+
+    function updateModeSettings() {
+      const isCustom = game.mode === "custom";
+      els.customSettings.classList.toggle("hidden", !isCustom);
+
+      if (game.mode === "classic") {
+        game.size = 4;
+        game.target = 2048;
+      } else if (game.mode === "challenge") {
+        game.size = 4;
+        game.target = 4096;
+      } else {
+        game.size = Number(els.customSizeSelect.value || 4);
+        game.target = Number(els.customTargetSelect.value || 4096);
+      }
+    }
+
+    function applyLanguage() {
+      const dict = i18n[game.lang] || i18n["zh-Hant"];
+      document.documentElement.lang = game.lang;
+      els.langSelect.value = game.lang;
+
+      document.querySelectorAll("[data-text]").forEach((node) => {
+        const key = node.getAttribute("data-text");
+        if (dict[key]) {
+          node.textContent = dict[key];
+        }
+      });
+
+      els.modeSelect.value = game.mode;
+      document.querySelectorAll("option[data-text]").forEach((option) => {
+        const key = option.getAttribute("data-text");
+        if (dict[key]) option.textContent = dict[key];
+      });
+
+      els.targetValue.textContent = game.target ? String(game.target) : "2048";
+    }
+
+    function applyTheme() {
+      const theme = game.theme || DEFAULT_THEME;
+      document.documentElement.style.setProperty("--bg-1", theme.bg1 || DEFAULT_THEME.bg1);
+      document.documentElement.style.setProperty("--bg-2", theme.bg2 || DEFAULT_THEME.bg2);
+      document.documentElement.style.setProperty("--panel", theme.panel || DEFAULT_THEME.panel);
+      document.documentElement.style.setProperty("--accent", theme.accent || DEFAULT_THEME.accent);
+
+      if (theme.bg1) els.themeBgInput.value = theme.bg1;
+      if (theme.panel) els.themePanelInput.value = theme.panel;
+      if (theme.accent) els.themeAccentInput.value = theme.accent;
+    }
+
+    function emptyBoard(size) {
+      return Array.from({ length: size }, () => Array(size).fill(0));
+    }
+
+    function cloneBoard(board) {
+      return board.map(row => [...row]);
+    }
+
+    function startNewGame() {
+      updateModeSettings();
+      game.board = emptyBoard(game.size);
+      game.score = 0;
+      game.history = [];
+      game.wonOnce = false;
+      game.state = "playing";
+
+      spawnRandomTile(game.board);
+      spawnRandomTile(game.board);
+
+      els.scoreValue.textContent = "0";
+      els.bestValue.textContent = String(game.best);
+      els.targetValue.textContent = String(game.target);
+      renderBoard();
+      validateBoard();
+    }
+
+    function spawnRandomTile(board) {
+      const empties = [];
+      for (let y = 0; y < board.length; y++) {
+        for (let x = 0; x < board[y].length; x++) {
+          if (board[y][x] === 0) empties.push([x, y]);
+        }
+      }
+
+      if (empties.length === 0) return false;
+
+      const [x, y] = empties[Math.floor(Math.random() * empties.length)];
+      board[y][x] = Math.random() < 0.9 ? 2 : 4;
+      return true;
+    }
+
+    function pushHistory() {
+      game.history.push({
+        board: cloneBoard(game.board),
+        score: game.score,
+        target: game.target,
+        size: game.size,
+        mode: game.mode
+      });
+      if (game.history.length > 24) {
+        game.history.shift();
+      }
+    }
+
+    function undoMove() {
+      const prev = game.history.pop();
+      if (!prev) {
+        showToast(i18n[game.lang].noHistory);
+        return;
+      }
+      game.board = cloneBoard(prev.board);
+      game.score = prev.score;
+      game.target = prev.target;
+      game.size = prev.size;
+      game.mode = prev.mode;
+      game.state = "playing";
+      els.modeSelect.value = game.mode;
+      updateModeSettings();
+      renderBoard();
+      els.scoreValue.textContent = String(game.score);
+      els.bestValue.textContent = String(game.best);
+      els.targetValue.textContent = String(game.target);
+      validateBoard();
+    }
+
+    function renderBoard() {
+      const boardSize = game.size;
+      els.board.style.gridTemplateColumns = `repeat(${boardSize}, minmax(0, 1fr))`;
+      els.board.innerHTML = "";
+
+      const allCells = [];
+      for (let y = 0; y < boardSize; y++) {
+        for (let x = 0; x < boardSize; x++) {
+          const cell = document.createElement("div");
+          cell.className = "cell";
+          cell.style.position = "relative";
+          cell.style.borderRadius = "12px";
+          allCells.push(cell);
+
+          const value = game.board[y][x];
+          if (value !== 0) {
+            const tile = document.createElement("div");
+            tile.className = "tile";
+            tile.dataset.value = String(value);
+            tile.textContent = value;
+            tile.style.background = getTileColor(value);
+            tile.style.fontSize = getTileFontSize(value);
+            tile.style.width = "100%";
+            tile.style.height = "100%";
+            cell.appendChild(tile);
+          }
+        }
+      }
+
+      els.board.append(...allCells);
+      els.scoreValue.textContent = String(game.score);
+      els.bestValue.textContent = String(game.best);
+      els.targetValue.textContent = String(game.target);
+      validateBoard();
+    }
+
+    function getTileColor(value) {
+      const palette = {
+        2: "var(--tile-2)",
+        4: "var(--tile-4)",
+        8: "var(--tile-8)",
+        16: "var(--tile-16)",
+        32: "var(--tile-32)",
+        64: "var(--tile-64)",
+        128: "var(--tile-128)",
+        256: "var(--tile-256)",
+        512: "var(--tile-512)",
+        1024: "var(--tile-1024)",
+        2048: "var(--tile-2048)",
+        4096: "var(--tile-4096)",
+        8192: "var(--tile-8192)",
+        16384: "var(--tile-16384)",
+        32768: "var(--tile-32768)",
+        65536: "var(--tile-65536)"
+      };
+      return palette[value] || "linear-gradient(135deg, #2d2e3f, #0d1228)";
+    }
+
+    function getTileFontSize(value) {
+      if (value >= 32768) return "clamp(0.7rem, 1.5vw, 1rem)";
+      if (value >= 16384) return "clamp(0.8rem, 1.8vw, 1.15rem)";
+      if (value >= 1024) return "clamp(0.9rem, 2vw, 1.35rem)";
+      if (value >= 128) return "clamp(1rem, 2vw, 1.65rem)";
+      if (value >= 8) return "clamp(1.1rem, 2vw, 1.8rem)";
+      return "clamp(1.2rem, 2vw, 1.9rem)";
+    }
+
+    function handleKeydown(event) {
+      const map = {
+        ArrowLeft: "left",
+        ArrowRight: "right",
+        ArrowUp: "up",
+        ArrowDown: "down",
+        a: "left",
+        d: "right",
+        w: "up",
+        s: "down"
+      };
+
+      const direction = map[event.key];
+      if (!direction) return;
+
+      event.preventDefault();
+      move(direction);
+    }
+
+    function move(direction) {
+      if (game.state === "lost") return;
+
+      const previous = cloneBoard(game.board);
+      const { board, moved, gained } = shiftBoard(game.board, direction);
+
+      if (!moved) {
+        if (!hasAnyMove(game.board)) {
+          game.state = "lost";
+          showToast(i18n[game.lang].lost);
+        } else {
+          showToast(i18n[game.lang].noMoves);
+        }
+        return;
+      }
+
+      pushHistory();
+
+      game.board = board;
+      game.score += gained;
+      game.best = Math.max(game.best, game.score);
+      localStorage.setItem(STORAGE_KEYS.best, String(game.best));
+
+      spawnRandomTile(game.board);
+
+      if (game.score >= game.target && !game.wonOnce) {
+        game.wonOnce = true;
+        showToast(i18n[game.lang].won);
+      }
+
+      if (!hasAnyMove(game.board)) {
+        game.state = "lost";
+        showToast(i18n[game.lang].lost);
+      }
+
+      if (game.score >= game.best) {
+        localStorage.setItem(STORAGE_KEYS.best, String(game.best));
+      }
+
+      renderBoard();
+
+      if (JSON.stringify(previous) === JSON.stringify(game.board)) {
+        showToast(i18n[game.lang].noMoves);
+      }
+    }
+
+    function shiftBoard(board, direction) {
+      const size = board.length;
+      let next = cloneBoard(board);
+      let gained = 0;
+      let moved = false;
+
+      const lines = [];
+      for (let i = 0; i < size; i++) {
+        const line = [];
+        if (direction === "left") {
+          for (let x = 0; x < size; x++) line.push({ x, y: i });
+        } else if (direction === "right") {
+          for (let x = size - 1; x >= 0; x--) line.push({ x, y: i });
+        } else if (direction === "up") {
+          for (let y = 0; y < size; y++) line.push({ x: i, y });
+        } else if (direction === "down") {
+          for (let y = size - 1; y >= 0; y--) line.push({ x: i, y });
+        }
+        lines.push(line);
+      }
+
+      for (const line of lines) {
+        const values = line.map(pos => next[pos.y][pos.x]).filter(v => v !== 0);
+        const merged = [];
+        let idx = 0;
+
+        while (idx < values.length) {
+          const current = values[idx];
+          const nextValue = values[idx + 1];
+
+          if (nextValue === current && current !== 0) {
+            const result = current * 2;
+            merged.push(result);
+            gained += result;
+            idx += 2;
+          } else {
+            merged.push(current);
+            idx += 1;
+          }
+        }
+
+        while (merged.length < size) merged.push(0);
+
+        line.forEach((pos, index) => {
+          const raw = merged[index];
+          const current = next[pos.y][pos.x];
+          if (current !== raw) moved = true;
+          next[pos.y][pos.x] = raw;
+        });
+      }
+
+      return { board: next, moved, gained };
+    }
+
+    function hasAnyMove(board) {
+      for (let y = 0; y < board.length; y++) {
+        for (let x = 0; x < board[y].length; x++) {
+          const v = board[y][x];
+          if (v === 0) return true;
+          const right = x + 1 < board[y].length ? board[y][x + 1] : null;
+          const down = y + 1 < board.length ? board[y + 1][x] : null;
+          if (right === v || down === v) return true;
+        }
+      }
+      return false;
+    }
+
+    function validateBoard() {
+      if (!Array.isArray(game.board) || game.board.length !== game.size) {
+        game.board = emptyBoard(game.size);
+        return;
+      }
+
+      for (let y = 0; y < game.board.length; y++) {
+        if (!Array.isArray(game.board[y]) || game.board[y].length !== game.size) {
+          game.board[y] = Array(game.size).fill(0);
+        }
+
+        for (let x = 0; x < game.board[y].length; x++) {
+          const v = game.board[y][x];
+          if (!Number.isFinite(v) || v < 0) {
+            game.board[y][x] = 0;
+          }
+        }
+      }
+    }
+
+    function showToast(msg) {
+      const toast = els.toast;
+      toast.textContent = msg;
+      toast.classList.add("visible");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => {
+        toast.classList.remove("visible");
+      }, 1600);
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen?.().catch(() => {});
+      } else {
+        document.exitFullscreen?.().catch(() => {});
+      }
+    }
+
+    function openSaveModal() {
+      renderSaveModal();
+      els.saveModal.classList.remove("hidden");
+    }
+
+    function closeSaveModal() {
+      els.saveModal.classList.add("hidden");
+    }
+
+    function renderSaveModal() {
+      const saved = getSaves();
+      const dict = i18n[game.lang] || i18n["zh-Hant"];
+
+      els.saveList.innerHTML = "";
+      saveSlots.forEach((slot) => {
+        const card = document.createElement("div");
+        card.className = "save-card";
+
+        const meta = document.createElement("div");
+        meta.className = "save-meta";
+
+        const title = document.createElement("strong");
+        title.textContent = `${dict.newSave} ${slot.replace("slot-", "")}`;
+
+        const time = document.createElement("span");
+        const saveInfo = saved[slot];
+        time.textContent = saveInfo ? new Date(saveInfo.savedAt).toLocaleString() : dict.empty;
+
+        meta.append(title, time);
+
+        const actions = document.createElement("div");
+        actions.className = "save-actions";
+
+        const saveBtn = document.createElement("button");
+        saveBtn.className = "save-slot";
+        saveBtn.type = "button";
+        saveBtn.dataset.action = "save-slot";
+        saveBtn.dataset.slot = slot;
+        saveBtn.textContent = saveInfo ? dict.overwrite : dict.save;
+
+        const loadBtn = document.createElement("button");
+        loadBtn.className = "load-slot";
+        loadBtn.type = "button";
+        loadBtn.dataset.action = "load-slot";
+        loadBtn.dataset.slot = slot;
+        loadBtn.textContent = dict.load;
+        loadBtn.disabled = !saveInfo;
+        if (!saveInfo) loadBtn.style.opacity = "0.5";
+
+        actions.append(saveBtn, loadBtn);
+
+        card.append(meta, actions);
+        els.saveList.appendChild(card);
+      });
+    }
+
+    function getSaves() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEYS.saveSlots);
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveGame(slot) {
+      const snapshot = {
+        board: cloneBoard(game.board),
+        score: game.score,
+        best: game.best,
+        size: game.size,
+        target: game.target,
+        mode: game.mode,
+        savedAt: new Date().toISOString()
+      };
+
+      const saves = getSaves();
+      saves[slot] = snapshot;
+      localStorage.setItem(STORAGE_KEYS.saveSlots, JSON.stringify(saves));
+      showToast(i18n[game.lang].saved);
+      renderSaveModal();
+    }
+
+    function loadGame(slot) {
+      const saves = getSaves();
+      const snapshot = saves[slot];
+      if (!snapshot) return;
+
+      game.board = cloneBoard(snapshot.board || emptyBoard(snapshot.size || 4));
+      game.score = snapshot.score || 0;
+      game.best = snapshot.best || 0;
+      game.size = snapshot.size || 4;
+      game.target = snapshot.target || 2048;
+      game.mode = snapshot.mode || "classic";
+      els.modeSelect.value = game.mode;
+      updateModeSettings();
+      game.state = "playing";
+      localStorage.setItem(STORAGE_KEYS.best, String(game.best));
+      showToast(i18n[game.lang].loaded);
+      renderBoard();
+      closeSaveModal();
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
