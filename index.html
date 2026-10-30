@@ -9,13 +9,10 @@
       --bg-1: #f7f2ff;
       --bg-2: #edf3ff;
       --panel: rgba(255, 255, 255, 0.74);
-      --panel-strong: rgba(255,255,255,0.92);
-      --surface: rgba(255,255,255,0.38);
       --text: #2a2f43;
       --muted: #687692;
       --accent: #7a6af6;
       --accent-2: #4dc9be;
-      --accent-3: #f7b955;
       --danger: #ff6b7a;
       --board-bg: #b9aee8;
       --cell-bg: rgba(255,255,255,0.26);
@@ -36,6 +33,7 @@
       --tile-16384: #d57dff;
       --tile-32768: #ff5d90;
       --tile-65536: #1f243a;
+      --obstacle: #7c8aa8;
       --font: "Segoe UI", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", "Arial", sans-serif;
     }
 
@@ -56,15 +54,19 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    body { display: flex; align-items: center; justify-content: center; padding: clamp(10px, 2vh, 22px); }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(10px,2vh,22px);
+    }
 
     #app {
-      width: min(100%, 600px);
-      min-height: min(94vh, 940px);
+      width: min(100%,600px);
+      min-height: min(94vh,940px);
       background: var(--panel);
       border: 1px solid rgba(255,255,255,0.55);
       backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
       border-radius: 30px;
       box-shadow: var(--shadow);
       padding: 18px 18px 14px;
@@ -75,24 +77,25 @@
       overflow: hidden;
     }
 
-    .topbar {
+    .topbar, .toolbar, .status-row, .top-controls, .toolbar-group, .modal-header, .save-actions {
       display: flex;
       align-items: center;
+    }
+
+    .topbar {
       justify-content: space-between;
-      gap: 12px;
       min-height: 52px;
+      gap: 12px;
     }
 
     .brand {
-      font-size: clamp(1.5rem, 2.4vw, 2.2rem);
+      font-size: clamp(1.5rem,2.4vw,2.2rem);
       font-weight: 900;
       letter-spacing: 0.05em;
       color: var(--text);
     }
 
     .top-controls {
-      display: flex;
-      align-items: center;
       justify-content: flex-end;
       gap: 8px;
       flex-wrap: wrap;
@@ -129,12 +132,8 @@
     select {
       min-width: 116px;
       appearance: none;
-      background-image:
-        linear-gradient(45deg, transparent 50%, var(--muted) 50%),
-        linear-gradient(135deg, var(--muted) 50%, transparent 50%);
-      background-position:
-        calc(100% - 18px) calc(50% - 2px),
-        calc(100% - 12px) calc(50% - 2px);
+      background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+      background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
       background-size: 6px 6px, 6px 6px;
       background-repeat: no-repeat;
       padding-right: 28px;
@@ -149,18 +148,14 @@
     }
 
     .toolbar {
-      display: flex;
-      align-items: flex-end;
       justify-content: space-between;
       gap: 10px;
       flex-wrap: wrap;
     }
 
     .toolbar-group {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
       gap: 8px;
+      flex-wrap: wrap;
       flex: 1;
     }
 
@@ -200,7 +195,7 @@
 
     .status-row {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0,1fr));
       gap: 10px;
     }
 
@@ -254,9 +249,9 @@
       position: relative;
       background: var(--cell-bg);
       border-radius: 12px;
-      overflow: hidden;
       width: 100%;
       height: 100%;
+      overflow: hidden;
     }
 
     .tile {
@@ -275,7 +270,6 @@
 
     .tile[data-value="2"], .tile[data-value="4"] { color: rgba(56,61,74,0.9); }
     .tile[data-value="128"], .tile[data-value="256"], .tile[data-value="512"], .tile[data-value="1024"], .tile[data-value="2048"], .tile[data-value="4096"], .tile[data-value="8192"], .tile[data-value="16384"], .tile[data-value="32768"], .tile[data-value="65536"] { color: rgba(255,255,255,0.96); }
-
     .tile.merged { animation: mergePulse 0.22s ease-out; }
 
     @keyframes popIn {
@@ -306,7 +300,7 @@
       transition: opacity 0.2s ease, transform 0.2s ease;
       box-shadow: 0 12px 24px rgba(18, 20, 31, 0.18);
       z-index: 70;
-      max-width: min(80vw, 420px);
+      max-width: min(80vw,420px);
     }
 
     .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -319,7 +313,6 @@
       justify-content: center;
       background: rgba(20, 22, 35, 0.56);
       backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
       z-index: 90;
       opacity: 1;
       transition: opacity 0.2s ease;
@@ -329,7 +322,7 @@
     .modal-overlay.hidden { opacity: 0; pointer-events: none; }
 
     .modal {
-      width: min(100%, 530px);
+      width: min(100%,530px);
       background: rgba(255,255,255,0.95);
       border-radius: 24px;
       border: 1px solid rgba(150,157,194,0.32);
@@ -339,8 +332,6 @@
     }
 
     .modal-header {
-      display: flex;
-      align-items: center;
       justify-content: space-between;
       gap: 10px;
       margin-bottom: 12px;
@@ -379,7 +370,6 @@
     }
 
     .save-actions {
-      display: flex;
       gap: 8px;
       margin-top: 4px;
     }
@@ -406,13 +396,7 @@
     .hidden { display: none !important; }
 
     @media (max-width: 560px) {
-      #app {
-        border-radius: 0;
-        width: 100%;
-        min-height: 100%;
-        padding: 14px 12px 12px;
-      }
-
+      #app { border-radius: 0; width: 100%; min-height: 100%; padding: 14px 12px 12px; }
       .topbar, .toolbar { align-items: stretch; }
       .toolbar { gap: 8px; }
       .toolbar-group { width: 100%; }
@@ -441,9 +425,16 @@
           <option value="classic" data-text="classic">Classic 2048</option>
           <option value="obstacle" data-text="obstacle">Obstacle</option>
           <option value="custom" data-text="custom">Custom</option>
-          <option value="duel" data-text="duel">2 Player</option>
-          <option value="ai" data-text="ai">AI</option>
         </select>
+
+        <div id="obstacleControls" class="toolbar-group hidden">
+          <label class="pill" data-text="difficulty">Difficulty</label>
+          <select id="difficultySelect">
+            <option value="easy" data-text="easy">Easy</option>
+            <option value="normal" data-text="normal" selected>Normal</option>
+            <option value="hard" data-text="hard">Hard</option>
+          </select>
+        </div>
 
         <div id="customSettings" class="toolbar-group hidden">
           <label class="pill" data-text="boardSize">Board</label>
@@ -481,8 +472,8 @@
         <span class="score-value" id="bestValue">0</span>
       </div>
       <div class="score-box">
-        <span class="score-label" data-text="turn">Turn</span>
-        <span class="score-value" id="turnValue">P1</span>
+        <span class="score-label" data-text="target">Target</span>
+        <span class="score-value" id="targetValue">2048</span>
       </div>
     </div>
 
@@ -513,12 +504,7 @@
   </div>
 
   <script>
-    const STORAGE_KEYS = {
-      best: "2048BestScoreV1",
-      saveSlots: "2048SaveSlotsV1",
-      language: "2048LanguageV1",
-      theme: "2048ThemeV1"
-    };
+    const STORAGE_KEYS = { best: "2048BestScoreV1", saveSlots: "2048SaveSlotsV1", language: "2048LanguageV1", theme: "2048ThemeV1" };
 
     const i18n = {
       "zh-Hant": {
@@ -528,13 +514,14 @@
         classic: "經典 2048",
         obstacle: "障礙模式",
         custom: "自定義",
-        duel: "雙人",
-        ai: "AI",
+        difficulty: "難度",
+        easy: "簡單",
+        normal: "普通",
+        hard: "困難",
         boardSize: "棋盤大小",
         target: "目標值",
         score: "分數",
         best: "最佳",
-        turn: "回合",
         undo: "回復上一步",
         restart: "重新開始",
         save: "存檔",
@@ -553,12 +540,10 @@
         restartConfirm: "確定要重新開始嗎？",
         noHistory: "沒有可回復的步驟",
         fullscreen: "全螢幕",
-        p1: "P1",
-        p2: "P2",
-        aiTurn: "AI 回合",
-        humanTurn: "玩家回合",
-        duelWin: "勝出者：",
-        draw: "平局"
+        obstacleGoal: "目標：達到 {target} 並清掉障礙",
+        obstacles: "障礙",
+        obstacleBlocked: "障礙格不能移動或合併",
+        goalComplete: "任務達成：障礙已清除！"
       },
       "zh-CN": {
         title: "2048",
@@ -567,13 +552,14 @@
         classic: "经典 2048",
         obstacle: "障碍模式",
         custom: "自定义",
-        duel: "双人",
-        ai: "AI",
+        difficulty: "难度",
+        easy: "简单",
+        normal: "普通",
+        hard: "困难",
         boardSize: "棋盘大小",
         target: "目标值",
         score: "分数",
         best: "最佳",
-        turn: "回合",
         undo: "恢复上一步",
         restart: "重新开始",
         save: "存档",
@@ -592,12 +578,10 @@
         restartConfirm: "确定要重新开始吗？",
         noHistory: "没有可恢复的步骤",
         fullscreen: "全屏",
-        p1: "P1",
-        p2: "P2",
-        aiTurn: "AI 回合",
-        humanTurn: "玩家回合",
-        duelWin: "胜出者：",
-        draw: "平局"
+        obstacleGoal: "目标：达到 {target} 并清掉障碍",
+        obstacles: "障碍",
+        obstacleBlocked: "障碍格不能移动或合并",
+        goalComplete: "任务达成：障碍已清除！"
       },
       en: {
         title: "2048",
@@ -606,13 +590,14 @@
         classic: "Classic 2048",
         obstacle: "Obstacle Mode",
         custom: "Custom",
-        duel: "2 Player",
-        ai: "AI",
+        difficulty: "Difficulty",
+        easy: "Easy",
+        normal: "Normal",
+        hard: "Hard",
         boardSize: "Board",
         target: "Target",
         score: "Score",
         best: "Best",
-        turn: "Turn",
         undo: "Undo",
         restart: "Restart",
         save: "Save",
@@ -631,17 +616,14 @@
         restartConfirm: "Restart the game?",
         noHistory: "Nothing to undo",
         fullscreen: "Full Screen",
-        p1: "P1",
-        p2: "P2",
-        aiTurn: "AI turn",
-        humanTurn: "Player turn",
-        duelWin: "Winner: ",
-        draw: "Draw"
+        obstacleGoal: "Goal: reach {target} and clear obstacles",
+        obstacles: "Obstacles",
+        obstacleBlocked: "Obstacles cannot move or merge",
+        goalComplete: "Mission complete: all obstacles cleared!"
       }
     };
 
     const DEFAULT_THEME = { bg1: "#f7f2ff", bg2: "#edf3ff", panel: "#ffffff", accent: "#7a6af6" };
-
     const game = {
       mode: "classic",
       size: 4,
@@ -649,15 +631,13 @@
       score: 0,
       best: 0,
       board: [],
+      obstacles: [],
       history: [],
       lang: "zh-Hant",
       wonOnce: false,
       state: "playing",
       theme: { ...DEFAULT_THEME },
-      currentPlayer: 0,
-      playerScores: [0, 0],
-      aiBusy: false,
-      aiDelay: 320
+      difficulty: "normal"
     };
 
     const els = {};
@@ -678,8 +658,10 @@
     function cacheElements() {
       els.modeSelect = document.getElementById("modeSelect");
       els.customSettings = document.getElementById("customSettings");
+      els.obstacleControls = document.getElementById("obstacleControls");
       els.customSizeSelect = document.getElementById("customSizeSelect");
       els.customTargetSelect = document.getElementById("customTargetSelect");
+      els.difficultySelect = document.getElementById("difficultySelect");
       els.undoBtn = document.getElementById("undoBtn");
       els.restartBtn = document.getElementById("restartBtn");
       els.saveBtn = document.getElementById("saveBtn");
@@ -688,7 +670,7 @@
       els.board = document.getElementById("board");
       els.scoreValue = document.getElementById("scoreValue");
       els.bestValue = document.getElementById("bestValue");
-      els.turnValue = document.getElementById("turnValue");
+      els.targetValue = document.getElementById("targetValue");
       els.toast = document.getElementById("toast");
       els.saveModal = document.getElementById("saveModal");
       els.saveList = document.getElementById("saveList");
@@ -705,34 +687,24 @@
         startNewGame();
       });
 
-      els.customSizeSelect.addEventListener("change", () => {
-        if (game.mode === "custom") startNewGame();
+      els.difficultySelect.addEventListener("change", () => {
+        game.difficulty = els.difficultySelect.value;
+        if (game.mode === "obstacle") startNewGame();
       });
 
-      els.customTargetSelect.addEventListener("change", () => {
-        if (game.mode === "custom") startNewGame();
-      });
-
+      els.customSizeSelect.addEventListener("change", () => { if (game.mode === "custom") startNewGame(); });
+      els.customTargetSelect.addEventListener("change", () => { if (game.mode === "custom") startNewGame(); });
       els.undoBtn.addEventListener("click", undoMove);
-      els.restartBtn.addEventListener("click", () => {
-        if (confirm(i18n[game.lang].restartConfirm)) startNewGame();
-      });
+      els.restartBtn.addEventListener("click", () => { if (confirm(i18n[game.lang].restartConfirm)) startNewGame(); });
       els.saveBtn.addEventListener("click", openSaveModal);
       els.closeSaveModal.addEventListener("click", closeSaveModal);
-
-      els.langSelect.addEventListener("change", () => {
-        game.lang = els.langSelect.value;
-        localStorage.setItem(STORAGE_KEYS.language, game.lang);
-        applyLanguage();
-        renderSaveModal();
-      });
-
+      els.langSelect.addEventListener("change", () => { game.lang = els.langSelect.value; localStorage.setItem(STORAGE_KEYS.language, game.lang); applyLanguage(); renderSaveModal(); });
       els.fullscreenBtn.addEventListener("click", toggleFullScreen);
 
       els.themeBgInput.addEventListener("input", () => {
         const value = els.themeBgInput.value;
-        const [r, g, b] = hexToRgb(value);
-        const dark = [r, g, b].map(v => Math.max(0, Math.min(255, v - 12))).join(",");
+        const [r,g,b] = hexToRgb(value);
+        const dark = [r,g,b].map(v => Math.min(255, Math.max(0, v - 12))).join(",");
         document.documentElement.style.setProperty("--bg-1", value);
         document.documentElement.style.setProperty("--bg-2", `rgb(${dark})`);
         game.theme.bg1 = value;
@@ -755,12 +727,10 @@
       });
 
       document.addEventListener("keydown", handleKeydown);
-
       document.addEventListener("touchstart", (event) => {
         const t = event.changedTouches[0];
         if (t) document.__touchStart = { x: t.clientX, y: t.clientY };
       }, { passive: true });
-
       document.addEventListener("touchend", (event) => {
         const start = document.__touchStart;
         if (!start) return;
@@ -782,12 +752,8 @@
         if (action === "load-slot") loadGame(event.target.dataset.slot);
       });
 
-      document.addEventListener("touchmove", (event) => {
-        if (event.cancelable) event.preventDefault();
-      }, { passive: false });
-      document.body.addEventListener("touchmove", (event) => {
-        if (event.cancelable) event.preventDefault();
-      }, { passive: false });
+      document.addEventListener("touchmove", (event) => { if (event.cancelable) event.preventDefault(); }, { passive: false });
+      document.body.addEventListener("touchmove", (event) => { if (event.cancelable) event.preventDefault(); }, { passive: false });
     }
 
     function hexToRgb(hex) {
@@ -800,18 +766,10 @@
     function initThemeFromStorage() {
       const saved = localStorage.getItem(STORAGE_KEYS.theme);
       if (!saved) return;
-      try {
-        const parsed = JSON.parse(saved);
-        game.theme = { ...DEFAULT_THEME, ...parsed };
-      } catch (e) {
-        game.theme = { ...DEFAULT_THEME };
-      }
+      try { game.theme = { ...DEFAULT_THEME, ...JSON.parse(saved) }; } catch (e) { game.theme = { ...DEFAULT_THEME }; }
     }
 
-    function persistTheme() {
-      localStorage.setItem(STORAGE_KEYS.theme, JSON.stringify(game.theme));
-    }
-
+    function persistTheme() { localStorage.setItem(STORAGE_KEYS.theme, JSON.stringify(game.theme)); }
     function initLanguageFromStorage() {
       const savedLang = localStorage.getItem(STORAGE_KEYS.language);
       if (savedLang && i18n[savedLang]) game.lang = savedLang;
@@ -824,19 +782,21 @@
 
     function updateModeSettings() {
       const isCustom = game.mode === "custom";
+      const isObstacle = game.mode === "obstacle";
       els.customSettings.classList.toggle("hidden", !isCustom);
+      els.obstacleControls.classList.toggle("hidden", !isObstacle);
 
       if (game.mode === "classic") {
         game.size = 4; game.target = 2048;
       } else if (game.mode === "obstacle") {
         game.size = 4; game.target = 4096;
-      } else if (game.mode === "duel") {
-        game.size = 4; game.target = 2048;
-      } else if (game.mode === "ai") {
-        game.size = 4; game.target = 2048;
       } else {
         game.size = Number(els.customSizeSelect.value || 4);
         game.target = Number(els.customTargetSelect.value || 4096);
+      }
+
+      if (game.mode === "obstacle") {
+        game.difficulty = els.difficultySelect.value || "normal";
       }
     }
 
@@ -852,7 +812,6 @@
         const key = option.getAttribute("data-text");
         if (dict[key]) option.textContent = dict[key];
       });
-      els.turnValue.textContent = getTurnLabel();
       const targetValueEl = document.getElementById("targetValue");
       if (targetValueEl) targetValueEl.textContent = String(game.target);
     }
@@ -873,35 +832,72 @@
     }
 
     function cloneBoard(board) {
-      return board.map(row => [...row]);
+      return board.map(row => row.slice());
+    }
+
+    function getObstacleConfig() {
+      const map = { easy: 2, normal: 4, hard: 7 };
+      return map[game.difficulty] || map.normal;
+    }
+
+    function generateObstacles(size, difficulty = game.difficulty) {
+      const board = emptyBoard(size);
+      const count = Math.min(size * size - 4, { easy: 2, normal: 4, hard: 8 }[difficulty] || 4);
+      const positions = new Set();
+      const safe = new Set();
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          if (x < 2 && y < 2) safe.add(`${x},${y}`);
+        }
+      }
+      while (positions.size < count) {
+        const x = Math.floor(Math.random() * size);
+        const y = Math.floor(Math.random() * size);
+        const key = `${x},${y}`;
+        if (safe.has(key)) continue;
+        positions.add(key);
+      }
+      positions.forEach((key) => {
+        const [x, y] = key.split(",").map(Number);
+        board[y][x] = -1;
+      });
+      return board;
     }
 
     function startNewGame() {
       updateModeSettings();
-      game.board = emptyBoard(game.size);
+      const base = emptyBoard(game.size);
+      game.board = base;
+      game.obstacles = [];
+      if (game.mode === "obstacle") {
+        const obstacleBoard = generateObstacles(game.size, game.difficulty);
+        game.board = obstacleBoard;
+        game.obstacles = getObstaclePositions(game.board);
+      }
+
       game.score = 0;
       game.history = [];
       game.wonOnce = false;
       game.state = "playing";
-      game.aiBusy = false;
-      game.currentPlayer = 0;
-      game.playerScores = [0, 0];
 
       spawnRandomTile(game.board);
       spawnRandomTile(game.board);
 
       els.scoreValue.textContent = "0";
       els.bestValue.textContent = String(game.best);
-      els.turnValue.textContent = getTurnLabel();
+      els.targetValue.textContent = String(game.target);
       renderBoard();
       validateBoard();
     }
 
-    function getTurnLabel() {
-      const dict = i18n[game.lang] || i18n["zh-Hant"];
-      if (game.mode === "duel") return game.currentPlayer === 0 ? dict.p1 : dict.p2;
-      if (game.mode === "ai") return game.aiBusy ? dict.aiTurn : dict.humanTurn;
-      return dict.p1;
+    function getObstaclePositions(board) {
+      const arr = [];
+      for (let y = 0; y < board.length; y++) {
+        for (let x = 0; x < board[y].length; x++) {
+          if (board[y][x] === -1) arr.push({ x, y });
+        }
+      }
+      return arr;
     }
 
     function spawnRandomTile(board) {
@@ -921,45 +917,45 @@
       game.history.push({
         board: cloneBoard(game.board),
         score: game.score,
-        playerScores: [...game.playerScores],
-        currentPlayer: game.currentPlayer,
-        mode: game.mode,
         target: game.target,
-        size: game.size
+        size: game.size,
+        mode: game.mode,
+        difficulty: game.difficulty,
+        obstacles: cloneObstacles(game.obstacles)
       });
       if (game.history.length > 24) game.history.shift();
     }
 
+    function cloneObstacles(arr) {
+      return arr.map(o => ({ ...o }));
+    }
+
     function undoMove() {
       const prev = game.history.pop();
-      if (!prev) {
-        showToast(i18n[game.lang].noHistory);
-        return;
-      }
+      if (!prev) { showToast(i18n[game.lang].noHistory); return; }
       game.board = cloneBoard(prev.board);
       game.score = prev.score;
-      game.playerScores = [...prev.playerScores];
-      game.currentPlayer = prev.currentPlayer;
       game.target = prev.target;
       game.size = prev.size;
       game.mode = prev.mode;
+      game.difficulty = prev.difficulty || "normal";
+      game.obstacles = cloneObstacles(prev.obstacles || []);
       game.state = "playing";
-      game.aiBusy = false;
       els.modeSelect.value = game.mode;
+      els.difficultySelect.value = game.difficulty;
       updateModeSettings();
       renderBoard();
       els.scoreValue.textContent = String(game.score);
       els.bestValue.textContent = String(game.best);
-      els.turnValue.textContent = getTurnLabel();
+      els.targetValue.textContent = String(game.target);
       validateBoard();
     }
 
     function renderBoard() {
       const size = game.size;
-      els.board.style.gridTemplateColumns = `repeat(${size}, minmax(0, 1fr))`;
+      els.board.style.gridTemplateColumns = `repeat(${size}, minmax(0,1fr))`;
       els.board.innerHTML = "";
-
-      const fragments = [];
+      const cells = [];
       for (let y = 0; y < size; y++) {
         for (let x = 0; x < size; x++) {
           const cell = document.createElement("div");
@@ -970,19 +966,17 @@
             tile.className = "tile";
             tile.dataset.value = String(value);
             tile.textContent = value === -1 ? "■" : value;
-            tile.style.background = value === -1 ? "linear-gradient(135deg, #7e88a6, #4e586f)" : getTileColor(value);
+            tile.style.background = value === -1 ? "linear-gradient(135deg, #8c96b2, #58657d)" : getTileColor(value);
             tile.style.fontSize = value === -1 ? "0.8rem" : getTileFontSize(value);
             cell.appendChild(tile);
           }
-          fragments.push(cell);
+          cells.push(cell);
         }
       }
-      els.board.append(...fragments);
+      els.board.append(...cells);
       els.scoreValue.textContent = String(game.score);
       els.bestValue.textContent = String(game.best);
-      els.turnValue.textContent = getTurnLabel();
-      const targetValueEl = document.getElementById("targetValue");
-      if (targetValueEl) targetValueEl.textContent = String(game.target);
+      els.targetValue.textContent = String(game.target);
     }
 
     function getTileColor(value) {
@@ -995,25 +989,16 @@
     }
 
     function getTileFontSize(value) {
-      if (value >= 32768) return "clamp(0.7rem, 1.4vw, 1rem)";
-      if (value >= 16384) return "clamp(0.8rem, 1.6vw, 1.12rem)";
-      if (value >= 1024) return "clamp(0.9rem, 2vw, 1.35rem)";
-      if (value >= 128) return "clamp(1rem, 2vw, 1.65rem)";
-      if (value >= 8) return "clamp(1.1rem, 2vw, 1.8rem)";
-      return "clamp(1.2rem, 2vw, 1.9rem)";
+      if (value >= 32768) return "clamp(0.7rem,1.4vw,1rem)";
+      if (value >= 16384) return "clamp(0.8rem,1.6vw,1.12rem)";
+      if (value >= 1024) return "clamp(0.9rem,2vw,1.35rem)";
+      if (value >= 128) return "clamp(1rem,2vw,1.65rem)";
+      if (value >= 8) return "clamp(1.1rem,2vw,1.8rem)";
+      return "clamp(1.2rem,2vw,1.9rem)";
     }
 
     function handleKeydown(event) {
-      const map = {
-        ArrowLeft: "left",
-        ArrowRight: "right",
-        ArrowUp: "up",
-        ArrowDown: "down",
-        a: "left",
-        d: "right",
-        w: "up",
-        s: "down"
-      };
+      const map = { ArrowLeft: "left", ArrowRight: "right", ArrowUp: "up", ArrowDown: "down", a: "left", d: "right", w: "up", s: "down" };
       const direction = map[event.key];
       if (!direction) return;
       event.preventDefault();
@@ -1022,12 +1007,6 @@
 
     function move(direction) {
       if (game.state === "lost") return;
-      if (game.mode === "ai" && game.aiBusy) return;
-      if (game.mode === "duel" && game.currentPlayer !== 0) {
-        showToast(i18n[game.lang].p2 + " turn");
-        return;
-      }
-
       const prev = cloneBoard(game.board);
       const result = shiftBoard(game.board, direction);
       if (!result.moved) {
@@ -1039,190 +1018,145 @@
       pushHistory();
       game.board = result.board;
       game.score += result.gained;
-      if (game.mode === "duel") {
-        game.playerScores[game.currentPlayer] += result.gained;
-        game.score = game.playerScores[game.currentPlayer];
-        game.best = Math.max(game.best, Math.max(...game.playerScores));
-      } else {
-        game.best = Math.max(game.best, game.score);
-      }
+      game.best = Math.max(game.best, game.score);
       localStorage.setItem(STORAGE_KEYS.best, String(game.best));
 
-      spawnRandomTile(game.board);
-      if (game.mode === "duel") {
-        game.currentPlayer = 1 - game.currentPlayer;
-        game.score = game.playerScores[game.currentPlayer];
+      if (game.mode === "obstacle") {
+        const cleared = clearObstaclesIfNeeded();
+        if (cleared) {
+          showToast(i18n[game.lang].goalComplete);
+        }
       }
 
+      spawnRandomTile(game.board);
       if (game.score >= game.target && !game.wonOnce) {
         game.wonOnce = true;
         showToast(i18n[game.lang].won);
       }
-
-      if (!hasAnyMove(game.board)) {
-        finishGame();
-      }
-
+      if (!hasAnyMove(game.board)) finishGame();
       renderBoard();
-      if (JSON.stringify(prev) === JSON.stringify(game.board)) {
-        showToast(i18n[game.lang].noMoves);
-      }
-
-      if (game.mode === "ai" && game.state === "playing") {
-        scheduleAiMove();
-      }
+      if (JSON.stringify(prev) === JSON.stringify(game.board)) showToast(i18n[game.lang].noMoves);
     }
 
-    function scheduleAiMove() {
-      if (game.aiBusy || game.mode !== "ai") return;
-      game.aiBusy = true;
-      els.turnValue.textContent = i18n[game.lang].aiTurn;
-      setTimeout(() => {
-        const moveDir = chooseAiMove(game.board);
-        if (moveDir) {
-          const prev = cloneBoard(game.board);
-          const result = shiftBoard(game.board, moveDir);
-          if (result.moved) {
-            game.board = result.board;
-            game.score += result.gained;
-            game.best = Math.max(game.best, game.score);
-            spawnRandomTile(game.board);
-            if (game.score >= game.target && !game.wonOnce) {
-              game.wonOnce = true;
-              showToast(i18n[game.lang].won);
-            }
-          }
-          renderBoard();
-          if (!hasAnyMove(game.board)) finishGame();
-        }
-        game.aiBusy = false;
-        els.turnValue.textContent = getTurnLabel();
-      }, game.aiDelay);
-    }
-
-    function chooseAiMove(board) {
-      const directions = ["up", "down", "left", "right"];
-      let best = { dir: null, score: -Infinity };
-      directions.forEach((dir) => {
-        const cloned = cloneBoard(board);
-        const result = shiftBoard(cloned, dir);
-        if (!result.moved) return;
-        const score = evaluateBoard(result.board) + result.gained * 12;
-        if (score > best.score) best = { dir, score };
-      });
-      return best.dir;
-    }
-
-    function evaluateBoard(board) {
-      let score = 0;
-      for (let y = 0; y < board.length; y++) {
-        for (let x = 0; x < board[y].length; x++) {
-          const v = board[y][x];
-          if (v === 0) score += 6;
-          if (x + 1 < board[y].length) {
-            const next = board[y][x + 1];
-            if (v && next) score += Math.abs(v - next) * 0.4;
-          }
-          if (y + 1 < board.length) {
-            const down = board[y + 1][x];
-            if (v && down) score += Math.abs(v - down) * 0.4;
-          }
-          score += v * 0.5;
-        }
+    function clearObstaclesIfNeeded() {
+      if (game.mode !== "obstacle") return false;
+      const before = game.obstacles.length;
+      const nextObstacles = [];
+      for (const pos of game.obstacles) {
+        const value = game.board[pos.y]?.[pos.x];
+        if (value !== -1) continue;
+        nextObstacles.push(pos);
       }
-      return score;
-    }
-
-    function finishGame() {
-      game.state = "lost";
-      if (game.mode === "duel") {
-        const p1 = game.playerScores[0];
-        const p2 = game.playerScores[1];
-        const result = p1 === p2 ? i18n[game.lang].draw : (p1 > p2 ? i18n[game.lang].duelWin + i18n[game.lang].p1 : i18n[game.lang].duelWin + i18n[game.lang].p2);
-        showToast(result);
-      } else {
-        showToast(i18n[game.lang].lost);
-      }
+      game.obstacles = nextObstacles;
+      return before !== nextObstacles.length;
     }
 
     function shiftBoard(board, direction) {
       const size = board.length;
       let next = cloneBoard(board);
-      let gained = 0;
       let moved = false;
-
+      let gained = 0;
       const lines = [];
       for (let i = 0; i < size; i++) {
         const line = [];
-        if (direction === "left") {
-          for (let x = 0; x < size; x++) line.push({ x, y: i });
-        } else if (direction === "right") {
-          for (let x = size - 1; x >= 0; x--) line.push({ x, y: i });
-        } else if (direction === "up") {
-          for (let y = 0; y < size; y++) line.push({ x: i, y });
-        } else if (direction === "down") {
-          for (let y = size - 1; y >= 0; y--) line.push({ x: i, y });
-        }
+        if (direction === "left") for (let x = 0; x < size; x++) line.push({ x, y: i });
+        else if (direction === "right") for (let x = size - 1; x >= 0; x--) line.push({ x, y: i });
+        else if (direction === "up") for (let y = 0; y < size; y++) line.push({ x: i, y });
+        else if (direction === "down") for (let y = size - 1; y >= 0; y--) line.push({ x: i, y });
         lines.push(line);
       }
 
       for (const line of lines) {
-        const values = line.map(pos => next[pos.y][pos.x]).filter(v => v !== 0);
-        const merged = [];
-        let idx = 0;
+        const actual = line.map(pos => next[pos.y][pos.x]);
+        const result = Array(size).fill(0);
+        const obstacleIndices = line.filter(pos => next[pos.y][pos.x] === -1).map(pos => line.indexOf(pos));
+        for (const pos of line) if (next[pos.y][pos.x] === -1) result[line.indexOf(pos)] = -1;
 
-        while (idx < values.length) {
-          const current = values[idx];
-          const nextValue = values[idx + 1];
-          if (nextValue === current && current !== 0) {
-            const resultVal = current * 2;
-            merged.push(resultVal);
-            gained += resultVal;
-            idx += 2;
+        const order = direction === "left" || direction === "up" ? line.map(pos => pos) : [...line].reverse();
+        let currentVals = [];
+        let currentPos = [];
+        const segments = [];
+        for (const pos of order) {
+          const value = next[pos.y][pos.x];
+          if (value === -1) {
+            if (currentVals.length) {
+              segments.push({ positions: currentPos.slice(), values: currentVals.slice() });
+              currentVals = [];
+              currentPos = [];
+            }
           } else {
-            merged.push(current);
-            idx += 1;
+            currentVals.push(value);
+            currentPos.push(line.indexOf(pos));
+          }
+        }
+        if (currentVals.length) segments.push({ positions: currentPos.slice(), values: currentVals.slice() });
+
+        for (const segment of segments) {
+          const processed = mergeSegment(segment.values);
+          for (let i = 0; i < segment.positions.length; i++) {
+            result[segment.positions[i]] = processed[i];
           }
         }
 
-        while (merged.length < size) merged.push(0);
-        line.forEach((pos, index) => {
-          const raw = merged[index];
-          const current = next[pos.y][pos.x];
+        for (const pos of line) {
+          const idx = line.indexOf(pos);
+          const current = board[pos.y][pos.x];
+          const raw = result[idx];
           if (current !== raw) moved = true;
           next[pos.y][pos.x] = raw;
-        });
+          if (raw !== 0) gained += raw > 1 && raw !== -1 ? raw / 2 : 0;
+        }
       }
 
       return { board: next, moved, gained };
     }
 
+    function mergeSegment(values) {
+      const compact = values.filter(v => v !== 0);
+      const output = [];
+      let i = 0;
+      while (i < compact.length) {
+        const current = compact[i];
+        const nextVal = compact[i + 1];
+        if (current !== 0 && nextVal === current) {
+          const merged = current * 2;
+          output.push(merged);
+          i += 2;
+        } else {
+          output.push(current);
+          i += 1;
+        }
+      }
+      while (output.length < values.length) output.push(0);
+      return output;
+    }
+
     function hasAnyMove(board) {
       for (let y = 0; y < board.length; y++) {
         for (let x = 0; x < board[y].length; x++) {
-          const v = board[y][x];
-          if (v === 0) return true;
+          if (board[y][x] === 0) return true;
+          if (board[y][x] === -1) continue;
           const right = x + 1 < board[y].length ? board[y][x + 1] : null;
           const down = y + 1 < board.length ? board[y + 1][x] : null;
-          if (right === v || down === v) return true;
+          if ((right !== null && right !== -1 && right === board[y][x]) || (down !== null && down !== -1 && down === board[y][x])) return true;
+          if (right === 0 || down === 0) return true;
         }
       }
       return false;
     }
 
+    function finishGame() {
+      game.state = "lost";
+      showToast(i18n[game.lang].lost);
+    }
+
     function validateBoard() {
-      if (!Array.isArray(game.board) || game.board.length !== game.size) {
-        game.board = emptyBoard(game.size);
-        return;
-      }
+      if (!Array.isArray(game.board) || game.board.length !== game.size) { game.board = emptyBoard(game.size); return; }
       for (let y = 0; y < game.board.length; y++) {
         if (!Array.isArray(game.board[y]) || game.board[y].length !== game.size) game.board[y] = Array(game.size).fill(0);
         for (let x = 0; x < game.board[y].length; x++) {
           const v = game.board[y][x];
-          if (!Number.isFinite(v) || v < 0) {
-            if (game.mode === "obstacle" && v === -1) continue;
-            game.board[y][x] = 0;
-          }
+          if (!Number.isFinite(v) || v < -1) game.board[y][x] = 0;
         }
       }
     }
@@ -1236,21 +1170,12 @@
     }
 
     function toggleFullScreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen?.().catch(() => {});
-      } else {
-        document.exitFullscreen?.().catch(() => {});
-      }
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
+      else document.exitFullscreen?.().catch(() => {});
     }
 
-    function openSaveModal() {
-      renderSaveModal();
-      els.saveModal.classList.remove("hidden");
-    }
-
-    function closeSaveModal() {
-      els.saveModal.classList.add("hidden");
-    }
+    function openSaveModal() { renderSaveModal(); els.saveModal.classList.remove("hidden"); }
+    function closeSaveModal() { els.saveModal.classList.add("hidden"); }
 
     function renderSaveModal() {
       const saved = getSaves();
@@ -1259,17 +1184,13 @@
       saveSlots.forEach((slot) => {
         const card = document.createElement("div");
         card.className = "save-card";
-
         const meta = document.createElement("div");
         meta.className = "save-meta";
-
         const title = document.createElement("strong");
         title.textContent = `${dict.newSave} ${slot.replace("slot-", "")}`;
-
         const time = document.createElement("span");
         const saveInfo = saved[slot];
         time.textContent = saveInfo ? new Date(saveInfo.savedAt).toLocaleString() : dict.empty;
-
         meta.append(title, time);
 
         const actions = document.createElement("div");
@@ -1290,7 +1211,6 @@
         loadBtn.textContent = dict.load;
         loadBtn.disabled = !saveInfo;
         if (!saveInfo) loadBtn.style.opacity = "0.5";
-
         actions.append(saveBtn, loadBtn);
         card.append(meta, actions);
         els.saveList.appendChild(card);
@@ -1298,11 +1218,8 @@
     }
 
     function getSaves() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEYS.saveSlots) || "{}") || {};
-      } catch (e) {
-        return {};
-      }
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.saveSlots) || "{}") || {}; }
+      catch (e) { return {}; }
     }
 
     function saveGame(slot) {
@@ -1313,8 +1230,8 @@
         size: game.size,
         target: game.target,
         mode: game.mode,
-        playerScores: [...game.playerScores],
-        currentPlayer: game.currentPlayer,
+        difficulty: game.difficulty,
+        obstacles: cloneObstacles(game.obstacles),
         savedAt: new Date().toISOString()
       };
       const saves = getSaves();
@@ -1334,12 +1251,12 @@
       game.size = snapshot.size || 4;
       game.target = snapshot.target || 2048;
       game.mode = snapshot.mode || "classic";
-      game.playerScores = Array.isArray(snapshot.playerScores) ? [...snapshot.playerScores] : [0, 0];
-      game.currentPlayer = typeof snapshot.currentPlayer === "number" ? snapshot.currentPlayer : 0;
+      game.difficulty = snapshot.difficulty || "normal";
+      game.obstacles = cloneObstacles(snapshot.obstacles || []);
       game.history = [];
-      game.aiBusy = false;
       game.state = "playing";
       els.modeSelect.value = game.mode;
+      els.difficultySelect.value = game.difficulty;
       updateModeSettings();
       localStorage.setItem(STORAGE_KEYS.best, String(game.best));
       renderBoard();
