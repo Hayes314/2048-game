@@ -3,79 +3,76 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-  <title>2048 Multi Mode</title>
+  <title>2048 Ultimate</title>
   <style>
     :root {
-      --bg-1: #f6f1ff;
-      --bg-2: #e9eeff;
-      --panel: rgba(255,255,255,0.72);
-      --panel-strong: rgba(255,255,255,0.9);
-      --text: #2e3852;
-      --muted: #69748d;
+      --bg-1: #f7f2ff;
+      --bg-2: #edf3ff;
+      --panel: rgba(255, 255, 255, 0.74);
+      --panel-strong: rgba(255,255,255,0.92);
+      --surface: rgba(255,255,255,0.38);
+      --text: #2a2f43;
+      --muted: #687692;
       --accent: #7a6af6;
-      --accent-2: #53c7c2;
-      --danger: #ff6d7c;
-      --board-bg: #bcaee6;
-      --cell-bg: rgba(255,255,255,0.38);
-      --shadow: 0 16px 40px rgba(63, 58, 107, 0.15);
-      --tile-empty: rgba(255,255,255,0.18);
+      --accent-2: #4dc9be;
+      --accent-3: #f7b955;
+      --danger: #ff6b7a;
+      --board-bg: #b9aee8;
+      --cell-bg: rgba(255,255,255,0.26);
+      --shadow: 0 18px 50px rgba(40, 34, 78, 0.18);
       --tile-2: #faf7ff;
-      --tile-4: #efeefb;
-      --tile-8: #f6d9a9;
-      --tile-16: #f9c98a;
-      --tile-32: #faaf66;
-      --tile-64: #ff8d60;
-      --tile-128: #f3d760;
-      --tile-256: #e6c640;
-      --tile-512: #d8ac4b;
-      --tile-1024: #a07ae9;
-      --tile-2048: #7a6af6;
-      --tile-4096: #44b295;
-      --tile-8192: #2eb0d6;
-      --tile-16384: #d772ff;
-      --tile-32768: #ff4d79;
-      --tile-65536: #1d1f34;
-      --font: "Segoe UI", "PingFang TC","Microsoft JhengHei","Noto Sans TC","Arial",sans-serif;
+      --tile-4: #f0ecff;
+      --tile-8: #ffdcae;
+      --tile-16: #ffc780;
+      --tile-32: #ffae72;
+      --tile-64: #ff8d61;
+      --tile-128: #f6d767;
+      --tile-256: #f0c93d;
+      --tile-512: #d8b04a;
+      --tile-1024: #7f70f9;
+      --tile-2048: #6a5ef8;
+      --tile-4096: #49b39a;
+      --tile-8192: #2e9fc9;
+      --tile-16384: #d57dff;
+      --tile-32768: #ff5d90;
+      --tile-65536: #1f243a;
+      --font: "Segoe UI", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", "Arial", sans-serif;
     }
 
     * { box-sizing: border-box; }
 
     html, body {
       width: 100%;
-      height: 100%;
+      min-height: 100%;
       margin: 0;
-      overscroll-behavior: none;
-      overflow: hidden;
-      touch-action: none;
       background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
       color: var(--text);
       font-family: var(--font);
+      overscroll-behavior: none;
+      overflow: hidden;
+      touch-action: none;
       -webkit-user-select: none;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
     }
 
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: clamp(10px, 2vh, 24px);
-    }
+    body { display: flex; align-items: center; justify-content: center; padding: clamp(10px, 2vh, 22px); }
 
     #app {
-      width: min(100%, 560px);
-      min-height: min(92vh, 900px);
+      width: min(100%, 600px);
+      min-height: min(94vh, 940px);
       background: var(--panel);
-      border: 1px solid rgba(255,255,255,0.6);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,0.55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 30px;
       box-shadow: var(--shadow);
       padding: 18px 18px 14px;
       display: flex;
       flex-direction: column;
       gap: 12px;
       position: relative;
+      overflow: hidden;
     }
 
     .topbar {
@@ -87,18 +84,18 @@
     }
 
     .brand {
+      font-size: clamp(1.5rem, 2.4vw, 2.2rem);
       font-weight: 900;
-      letter-spacing: 0.04em;
-      font-size: clamp(1.5rem, 2vw, 2rem);
+      letter-spacing: 0.05em;
       color: var(--text);
     }
 
     .top-controls {
       display: flex;
       align-items: center;
+      justify-content: flex-end;
       gap: 8px;
       flex-wrap: wrap;
-      justify-content: flex-end;
     }
 
     .pill, button, select, input {
@@ -109,18 +106,20 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid rgba(255,255,255,0.5);
       background: rgba(255,255,255,0.45);
+      border: 1px solid rgba(255,255,255,0.6);
       color: var(--text);
       border-radius: 12px;
       padding: 8px 10px;
-      font-size: 0.82rem;
+      min-height: 38px;
+      font-size: 0.8rem;
       font-weight: 700;
+      white-space: nowrap;
     }
 
     select, input[type="color"] {
-      border: 1px solid rgba(140,146,180,0.3);
       background: rgba(255,255,255,0.8);
+      border: 1px solid rgba(138,146,179,0.28);
       border-radius: 12px;
       color: var(--text);
       padding: 8px 10px;
@@ -128,7 +127,7 @@
     }
 
     select {
-      min-width: 118px;
+      min-width: 116px;
       appearance: none;
       background-image:
         linear-gradient(45deg, transparent 50%, var(--muted) 50%),
@@ -138,14 +137,14 @@
         calc(100% - 12px) calc(50% - 2px);
       background-size: 6px 6px, 6px 6px;
       background-repeat: no-repeat;
-      padding-right: 32px;
+      padding-right: 28px;
     }
 
     input[type="color"] {
       width: 42px;
       height: 38px;
-      padding: 4px;
       min-width: 42px;
+      padding: 4px;
       cursor: pointer;
     }
 
@@ -159,23 +158,23 @@
 
     .toolbar-group {
       display: flex;
-      gap: 8px;
       align-items: center;
       flex-wrap: wrap;
+      gap: 8px;
       flex: 1;
     }
 
-    .toolbar .action-btn, .primary-btn, .secondary-btn, .icon-btn {
+    .primary-btn, .secondary-btn, .icon-btn {
       border: 0;
       border-radius: 12px;
       padding: 10px 12px;
       font-weight: 800;
       cursor: pointer;
-      transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.2s ease;
-      box-shadow: 0 8px 18px rgba(64, 60, 97, 0.1);
+      transition: transform 0.16s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      box-shadow: 0 10px 20px rgba(48,44,81,0.08);
     }
 
-    .action-btn, .secondary-btn {
+    .secondary-btn {
       background: rgba(255,255,255,0.5);
       color: var(--text);
     }
@@ -188,18 +187,16 @@
     .icon-btn {
       width: 40px;
       height: 40px;
+      padding: 0;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       font-size: 1.1rem;
       background: rgba(255,255,255,0.56);
       color: var(--text);
-      padding: 0;
     }
 
-    button:active, .icon-btn:active {
-      transform: translateY(1px) scale(0.99);
-    }
+    button:active { transform: translateY(1px) scale(0.99); }
 
     .status-row {
       display: grid;
@@ -208,35 +205,36 @@
     }
 
     .score-box {
-      background: rgba(255,255,255,0.45);
+      background: rgba(255,255,255,0.44);
       border-radius: 16px;
       padding: 10px 12px;
       text-align: center;
-      border: 1px solid rgba(153,160,196,0.22);
+      border: 1px solid rgba(153,160,196,0.18);
     }
 
     .score-label {
-      font-size: 0.68rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+      display: block;
       color: var(--muted);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
       font-weight: 800;
     }
 
     .score-value {
       display: block;
-      margin-top: 4px;
-      font-size: clamp(1.1rem, 2vw, 1.7rem);
+      margin-top: 6px;
+      font-size: clamp(1.08rem, 2vw, 1.8rem);
       font-weight: 900;
       color: var(--text);
     }
 
     .board-shell {
-      background: rgba(255,255,255,0.3);
-      border-radius: 26px;
       padding: 12px;
-      border: 1px solid rgba(150,157,194,0.15);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+      border-radius: 28px;
+      background: rgba(255,255,255,0.26);
+      border: 1px solid rgba(150,157,194,0.12);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
     }
 
     .board {
@@ -246,7 +244,7 @@
       width: 100%;
       aspect-ratio: 1 / 1;
       background: var(--board-bg);
-      border-radius: 18px;
+      border-radius: 20px;
       padding: 10px;
       touch-action: none;
       user-select: none;
@@ -254,11 +252,11 @@
 
     .cell {
       position: relative;
-      border-radius: 12px;
       background: var(--cell-bg);
+      border-radius: 12px;
+      overflow: hidden;
       width: 100%;
       height: 100%;
-      overflow: hidden;
     }
 
     .tile {
@@ -269,134 +267,86 @@
       align-items: center;
       justify-content: center;
       font-weight: 900;
-      color: rgba(30,35,48,0.82);
-      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.08), 0 4px 12px rgba(30, 35, 48, 0.08);
+      color: rgba(30,35,48,0.86);
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.08), 0 5px 10px rgba(30,35,48,0.08);
       animation: popIn 0.18s ease-out;
-      transition: transform 0.14s ease, filter 0.15s ease, opacity 0.15s ease;
+      transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
     }
 
-    .tile[data-value="2"], .tile[data-value="4"] {
-      color: rgba(52,57,73,0.9);
-    }
+    .tile[data-value="2"], .tile[data-value="4"] { color: rgba(56,61,74,0.9); }
+    .tile[data-value="128"], .tile[data-value="256"], .tile[data-value="512"], .tile[data-value="1024"], .tile[data-value="2048"], .tile[data-value="4096"], .tile[data-value="8192"], .tile[data-value="16384"], .tile[data-value="32768"], .tile[data-value="65536"] { color: rgba(255,255,255,0.96); }
 
-    .tile[data-value="128"], .tile[data-value="256"], .tile[data-value="512"], .tile[data-value="1024"], .tile[data-value="2048"], .tile[data-value="4096"], .tile[data-value="8192"], .tile[data-value="16384"], .tile[data-value="32768"], .tile[data-value="65536"] {
-      color: rgba(255,255,255,0.95);
-    }
-
-    .tile[data-value="65536"] {
-      font-size: clamp(0.7rem, 2vw, 1rem);
-    }
-
-    .tile[data-value="32768"], .tile[data-value="16384"] {
-      font-size: clamp(0.8rem, 2vw, 1.2rem);
-    }
-
-    .tile[data-value="1024"], .tile[data-value="2048"], .tile[data-value="4096"], .tile[data-value="8192"] {
-      font-size: clamp(0.9rem, 2vw, 1.35rem);
-    }
-
-    .tile[data-value="512"] {
-      font-size: clamp(0.95rem, 2vw, 1.4rem);
-    }
-
-    .tile[data-value="128"], .tile[data-value="256"] {
-      font-size: clamp(1rem, 2vw, 1.6rem);
-    }
-
-    .tile[data-value="32"], .tile[data-value="64"] {
-      font-size: clamp(1.05rem, 2vw, 1.65rem);
-    }
-
-    .tile[data-value="8"], .tile[data-value="16"] {
-      font-size: clamp(1.15rem, 2vw, 1.7rem);
-    }
-
-    .tile[data-value="2"], .tile[data-value="4"] {
-      font-size: clamp(1.25rem, 2vw, 1.8rem);
-    }
+    .tile.merged { animation: mergePulse 0.22s ease-out; }
 
     @keyframes popIn {
       0% { transform: scale(0.7); opacity: 0; }
-      70% { transform: scale(1.06); opacity: 1; }
+      70% { transform: scale(1.07); opacity: 1; }
       100% { transform: scale(1); opacity: 1; }
-    }
-
-    .tile.merged {
-      animation: mergePulse 0.2s ease-out;
     }
 
     @keyframes mergePulse {
       0% { transform: scale(1); filter: brightness(1); }
-      50% { transform: scale(1.08); filter: brightness(1.1); }
+      50% { transform: scale(1.09); filter: brightness(1.1); }
       100% { transform: scale(1); filter: brightness(1); }
     }
 
     .toast {
       position: fixed;
       left: 50%;
-      bottom: 18px;
+      bottom: 22px;
       transform: translateX(-50%) translateY(8px);
-      max-width: min(80vw, 420px);
-      background: rgba(33,36,52,0.9);
+      background: rgba(29,31,42,0.92);
       color: white;
-      padding: 10px 14px;
       border-radius: 999px;
+      padding: 10px 14px;
       font-size: 0.9rem;
       font-weight: 700;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.2s ease, transform 0.2s ease;
-      box-shadow: 0 12px 24px rgba(20, 20, 36, 0.16);
-      z-index: 60;
+      box-shadow: 0 12px 24px rgba(18, 20, 31, 0.18);
+      z-index: 70;
+      max-width: min(80vw, 420px);
     }
 
-    .toast.visible {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
+    .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(18, 20, 32, 0.5);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
-      z-index: 80;
+      background: rgba(20, 22, 35, 0.56);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 90;
       opacity: 1;
       transition: opacity 0.2s ease;
+      padding: 18px;
     }
 
-    .modal-overlay.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
+    .modal-overlay.hidden { opacity: 0; pointer-events: none; }
 
     .modal {
-      width: min(100%, 520px);
-      background: rgba(255,255,255,0.94);
-      color: var(--text);
+      width: min(100%, 530px);
+      background: rgba(255,255,255,0.95);
       border-radius: 24px;
+      border: 1px solid rgba(150,157,194,0.32);
+      box-shadow: 0 22px 56px rgba(18,20,40,0.18);
       padding: 18px 16px 16px;
-      box-shadow: 0 18px 52px rgba(21, 22, 36, 0.22);
-      border: 1px solid rgba(160,168,204,0.35);
+      color: var(--text);
     }
 
     .modal-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 10px;
       margin-bottom: 12px;
-      gap: 8px;
     }
 
-    .modal-header h3 {
-      margin: 0;
-      font-size: 1.2rem;
-    }
+    .modal-header h3 { margin: 0; font-size: 1.2rem; }
 
     .save-list {
       display: grid;
@@ -406,9 +356,9 @@
     }
 
     .save-card {
-      background: rgba(245,246,255,0.9);
-      border: 1px solid rgba(160,168,204,0.25);
+      background: rgba(245,247,255,0.9);
       border-radius: 16px;
+      border: 1px solid rgba(160,168,204,0.26);
       padding: 12px;
       display: flex;
       flex-direction: column;
@@ -418,9 +368,9 @@
     .save-meta {
       display: flex;
       flex-direction: column;
-      gap: 2px;
-      font-size: 0.82rem;
+      gap: 3px;
       color: var(--muted);
+      font-size: 0.8rem;
     }
 
     .save-meta strong {
@@ -443,52 +393,32 @@
       cursor: pointer;
     }
 
-    .save-actions .save-slot {
+    .save-slot {
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: white;
+      color: #fff;
     }
 
-    .save-actions .load-slot {
-      background: rgba(255,255,255,0.7);
+    .load-slot {
+      background: rgba(255,255,255,0.72);
       color: var(--text);
     }
 
-    .hidden {
-      display: none !important;
-    }
+    .hidden { display: none !important; }
 
     @media (max-width: 560px) {
       #app {
+        border-radius: 0;
         width: 100%;
         min-height: 100%;
-        border-radius: 0;
-        padding: 14px 12px 14px;
+        padding: 14px 12px 12px;
       }
 
-      .topbar, .toolbar {
-        align-items: stretch;
-      }
-
-      .toolbar {
-        gap: 8px;
-      }
-
-      .toolbar-group {
-        width: 100%;
-      }
-
-      .top-controls {
-        width: 100%;
-        justify-content: flex-start;
-      }
-
-      .action-btn, .primary-btn, .secondary-btn, .icon-btn {
-        flex: 1;
-      }
-
-      .board-shell {
-        padding: 10px;
-      }
+      .topbar, .toolbar { align-items: stretch; }
+      .toolbar { gap: 8px; }
+      .toolbar-group { width: 100%; }
+      .top-controls { justify-content: flex-start; width: 100%; }
+      .secondary-btn, .primary-btn, .icon-btn { flex: 1; }
+      .board-shell { padding: 10px; }
     }
   </style>
 </head>
@@ -497,7 +427,7 @@
     <div class="topbar">
       <div class="brand" data-text="title">2048</div>
       <div class="top-controls">
-        <div class="pill" id="themeLabel" data-text="colors">Theme</div>
+        <div class="pill" data-text="colors">Theme</div>
         <input id="themeBgInput" type="color" aria-label="Background color" />
         <input id="themePanelInput" type="color" aria-label="Panel color" />
         <input id="themeAccentInput" type="color" aria-label="Accent color" />
@@ -509,8 +439,10 @@
         <label class="pill" data-text="mode">Mode</label>
         <select id="modeSelect" aria-label="Game mode">
           <option value="classic" data-text="classic">Classic 2048</option>
-          <option value="challenge" data-text="challenge">Challenge 4096</option>
+          <option value="obstacle" data-text="obstacle">Obstacle</option>
           <option value="custom" data-text="custom">Custom</option>
+          <option value="duel" data-text="duel">2 Player</option>
+          <option value="ai" data-text="ai">AI</option>
         </select>
 
         <div id="customSettings" class="toolbar-group hidden">
@@ -549,8 +481,8 @@
         <span class="score-value" id="bestValue">0</span>
       </div>
       <div class="score-box">
-        <span class="score-label" data-text="target">Target</span>
-        <span class="score-value" id="targetValue">2048</span>
+        <span class="score-label" data-text="turn">Turn</span>
+        <span class="score-value" id="turnValue">P1</span>
       </div>
     </div>
 
@@ -594,12 +526,15 @@
         colors: "調色系",
         mode: "玩法",
         classic: "經典 2048",
-        challenge: "挑戰 4096",
+        obstacle: "障礙模式",
         custom: "自定義",
+        duel: "雙人",
+        ai: "AI",
         boardSize: "棋盤大小",
         target: "目標值",
         score: "分數",
         best: "最佳",
+        turn: "回合",
         undo: "回復上一步",
         restart: "重新開始",
         save: "存檔",
@@ -617,19 +552,28 @@
         lost: "遊戲結束，沒有可移動的空間。",
         restartConfirm: "確定要重新開始嗎？",
         noHistory: "沒有可回復的步驟",
-        fullscreen: "全螢幕"
+        fullscreen: "全螢幕",
+        p1: "P1",
+        p2: "P2",
+        aiTurn: "AI 回合",
+        humanTurn: "玩家回合",
+        duelWin: "勝出者：",
+        draw: "平局"
       },
       "zh-CN": {
         title: "2048",
         colors: "调色系",
         mode: "玩法",
         classic: "经典 2048",
-        challenge: "挑战 4096",
+        obstacle: "障碍模式",
         custom: "自定义",
+        duel: "双人",
+        ai: "AI",
         boardSize: "棋盘大小",
         target: "目标值",
         score: "分数",
         best: "最佳",
+        turn: "回合",
         undo: "恢复上一步",
         restart: "重新开始",
         save: "存档",
@@ -647,19 +591,28 @@
         lost: "游戏结束，没有可移动的空间。",
         restartConfirm: "确定要重新开始吗？",
         noHistory: "没有可恢复的步骤",
-        fullscreen: "全屏"
+        fullscreen: "全屏",
+        p1: "P1",
+        p2: "P2",
+        aiTurn: "AI 回合",
+        humanTurn: "玩家回合",
+        duelWin: "胜出者：",
+        draw: "平局"
       },
       en: {
         title: "2048",
         colors: "Theme",
         mode: "Mode",
         classic: "Classic 2048",
-        challenge: "Challenge 4096",
+        obstacle: "Obstacle Mode",
         custom: "Custom",
+        duel: "2 Player",
+        ai: "AI",
         boardSize: "Board",
         target: "Target",
         score: "Score",
         best: "Best",
+        turn: "Turn",
         undo: "Undo",
         restart: "Restart",
         save: "Save",
@@ -677,16 +630,17 @@
         lost: "No more moves available.",
         restartConfirm: "Restart the game?",
         noHistory: "Nothing to undo",
-        fullscreen: "Full Screen"
+        fullscreen: "Full Screen",
+        p1: "P1",
+        p2: "P2",
+        aiTurn: "AI turn",
+        humanTurn: "Player turn",
+        duelWin: "Winner: ",
+        draw: "Draw"
       }
     };
 
-    const DEFAULT_THEME = {
-      bg1: "#f6f1ff",
-      bg2: "#e9eeff",
-      panel: "#ffffff",
-      accent: "#7a6af6"
-    };
+    const DEFAULT_THEME = { bg1: "#f7f2ff", bg2: "#edf3ff", panel: "#ffffff", accent: "#7a6af6" };
 
     const game = {
       mode: "classic",
@@ -699,7 +653,11 @@
       lang: "zh-Hant",
       wonOnce: false,
       state: "playing",
-      theme: { ...DEFAULT_THEME }
+      theme: { ...DEFAULT_THEME },
+      currentPlayer: 0,
+      playerScores: [0, 0],
+      aiBusy: false,
+      aiDelay: 320
     };
 
     const els = {};
@@ -730,7 +688,7 @@
       els.board = document.getElementById("board");
       els.scoreValue = document.getElementById("scoreValue");
       els.bestValue = document.getElementById("bestValue");
-      els.targetValue = document.getElementById("targetValue");
+      els.turnValue = document.getElementById("turnValue");
       els.toast = document.getElementById("toast");
       els.saveModal = document.getElementById("saveModal");
       els.saveList = document.getElementById("saveList");
@@ -748,22 +706,16 @@
       });
 
       els.customSizeSelect.addEventListener("change", () => {
-        if (game.mode === "custom") {
-          startNewGame();
-        }
+        if (game.mode === "custom") startNewGame();
       });
 
       els.customTargetSelect.addEventListener("change", () => {
-        if (game.mode === "custom") {
-          startNewGame();
-        }
+        if (game.mode === "custom") startNewGame();
       });
 
       els.undoBtn.addEventListener("click", undoMove);
       els.restartBtn.addEventListener("click", () => {
-        if (confirm(i18n[game.lang].restartConfirm)) {
-          startNewGame();
-        }
+        if (confirm(i18n[game.lang].restartConfirm)) startNewGame();
       });
       els.saveBtn.addEventListener("click", openSaveModal);
       els.closeSaveModal.addEventListener("click", closeSaveModal);
@@ -780,7 +732,7 @@
       els.themeBgInput.addEventListener("input", () => {
         const value = els.themeBgInput.value;
         const [r, g, b] = hexToRgb(value);
-        const dark = [r, g, b].map(v => Math.max(0, Math.min(255, v - 14))).join(",");
+        const dark = [r, g, b].map(v => Math.max(0, Math.min(255, v - 12))).join(",");
         document.documentElement.style.setProperty("--bg-1", value);
         document.documentElement.style.setProperty("--bg-2", `rgb(${dark})`);
         game.theme.bg1 = value;
@@ -805,50 +757,34 @@
       document.addEventListener("keydown", handleKeydown);
 
       document.addEventListener("touchstart", (event) => {
-        const touch = event.changedTouches[0];
-        if (!touch) return;
-        document.__touchStart = { x: touch.clientX, y: touch.clientY };
+        const t = event.changedTouches[0];
+        if (t) document.__touchStart = { x: t.clientX, y: t.clientY };
       }, { passive: true });
 
       document.addEventListener("touchend", (event) => {
         const start = document.__touchStart;
         if (!start) return;
-        const touch = event.changedTouches[0];
-        if (!touch) return;
-        const dx = touch.clientX - start.x;
-        const dy = touch.clientY - start.y;
-        const absX = Math.abs(dx);
-        const absY = Math.abs(dy);
-
-        if (Math.max(absX, absY) < 28) return;
-
-        if (absX > absY) {
-          move(dx > 0 ? "right" : "left");
-        } else {
-          move(dy > 0 ? "down" : "up");
-        }
+        const t = event.changedTouches[0];
+        if (!t) return;
+        const dx = t.clientX - start.x;
+        const dy = t.clientY - start.y;
+        const absX = Math.abs(dx), absY = Math.abs(dy);
+        if (Math.max(absX, absY) < 26) return;
+        if (absX > absY) move(dx > 0 ? "right" : "left");
+        else move(dy > 0 ? "down" : "up");
         delete document.__touchStart;
       }, { passive: true });
 
       document.addEventListener("click", (event) => {
         const action = event.target.dataset.action;
         if (!action) return;
-
-        if (action === "save-slot") {
-          const slot = event.target.dataset.slot;
-          saveGame(slot);
-        }
-
-        if (action === "load-slot") {
-          const slot = event.target.dataset.slot;
-          loadGame(slot);
-        }
+        if (action === "save-slot") saveGame(event.target.dataset.slot);
+        if (action === "load-slot") loadGame(event.target.dataset.slot);
       });
 
       document.addEventListener("touchmove", (event) => {
         if (event.cancelable) event.preventDefault();
       }, { passive: false });
-
       document.body.addEventListener("touchmove", (event) => {
         if (event.cancelable) event.preventDefault();
       }, { passive: false });
@@ -856,22 +792,19 @@
 
     function hexToRgb(hex) {
       const clean = hex.replace("#", "");
-      const full = clean.length === 3
-        ? clean.split("").map(ch => ch + ch).join("")
-        : clean;
+      const full = clean.length === 3 ? clean.split("").map(ch => ch + ch).join("") : clean;
       const num = parseInt(full, 16);
       return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
     }
 
     function initThemeFromStorage() {
       const saved = localStorage.getItem(STORAGE_KEYS.theme);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          game.theme = { ...DEFAULT_THEME, ...parsed };
-        } catch (e) {
-          game.theme = { ...DEFAULT_THEME };
-        }
+      if (!saved) return;
+      try {
+        const parsed = JSON.parse(saved);
+        game.theme = { ...DEFAULT_THEME, ...parsed };
+      } catch (e) {
+        game.theme = { ...DEFAULT_THEME };
       }
     }
 
@@ -881,9 +814,7 @@
 
     function initLanguageFromStorage() {
       const savedLang = localStorage.getItem(STORAGE_KEYS.language);
-      if (savedLang && i18n[savedLang]) {
-        game.lang = savedLang;
-      }
+      if (savedLang && i18n[savedLang]) game.lang = savedLang;
     }
 
     function loadBest() {
@@ -896,11 +827,13 @@
       els.customSettings.classList.toggle("hidden", !isCustom);
 
       if (game.mode === "classic") {
-        game.size = 4;
-        game.target = 2048;
-      } else if (game.mode === "challenge") {
-        game.size = 4;
-        game.target = 4096;
+        game.size = 4; game.target = 2048;
+      } else if (game.mode === "obstacle") {
+        game.size = 4; game.target = 4096;
+      } else if (game.mode === "duel") {
+        game.size = 4; game.target = 2048;
+      } else if (game.mode === "ai") {
+        game.size = 4; game.target = 2048;
       } else {
         game.size = Number(els.customSizeSelect.value || 4);
         game.target = Number(els.customTargetSelect.value || 4096);
@@ -911,21 +844,17 @@
       const dict = i18n[game.lang] || i18n["zh-Hant"];
       document.documentElement.lang = game.lang;
       els.langSelect.value = game.lang;
-
       document.querySelectorAll("[data-text]").forEach((node) => {
         const key = node.getAttribute("data-text");
-        if (dict[key]) {
-          node.textContent = dict[key];
-        }
+        if (dict[key]) node.textContent = dict[key];
       });
-
-      els.modeSelect.value = game.mode;
       document.querySelectorAll("option[data-text]").forEach((option) => {
         const key = option.getAttribute("data-text");
         if (dict[key]) option.textContent = dict[key];
       });
-
-      els.targetValue.textContent = game.target ? String(game.target) : "2048";
+      els.turnValue.textContent = getTurnLabel();
+      const targetValueEl = document.getElementById("targetValue");
+      if (targetValueEl) targetValueEl.textContent = String(game.target);
     }
 
     function applyTheme() {
@@ -934,7 +863,6 @@
       document.documentElement.style.setProperty("--bg-2", theme.bg2 || DEFAULT_THEME.bg2);
       document.documentElement.style.setProperty("--panel", theme.panel || DEFAULT_THEME.panel);
       document.documentElement.style.setProperty("--accent", theme.accent || DEFAULT_THEME.accent);
-
       if (theme.bg1) els.themeBgInput.value = theme.bg1;
       if (theme.panel) els.themePanelInput.value = theme.panel;
       if (theme.accent) els.themeAccentInput.value = theme.accent;
@@ -955,15 +883,25 @@
       game.history = [];
       game.wonOnce = false;
       game.state = "playing";
+      game.aiBusy = false;
+      game.currentPlayer = 0;
+      game.playerScores = [0, 0];
 
       spawnRandomTile(game.board);
       spawnRandomTile(game.board);
 
       els.scoreValue.textContent = "0";
       els.bestValue.textContent = String(game.best);
-      els.targetValue.textContent = String(game.target);
+      els.turnValue.textContent = getTurnLabel();
       renderBoard();
       validateBoard();
+    }
+
+    function getTurnLabel() {
+      const dict = i18n[game.lang] || i18n["zh-Hant"];
+      if (game.mode === "duel") return game.currentPlayer === 0 ? dict.p1 : dict.p2;
+      if (game.mode === "ai") return game.aiBusy ? dict.aiTurn : dict.humanTurn;
+      return dict.p1;
     }
 
     function spawnRandomTile(board) {
@@ -973,9 +911,7 @@
           if (board[y][x] === 0) empties.push([x, y]);
         }
       }
-
-      if (empties.length === 0) return false;
-
+      if (!empties.length) return false;
       const [x, y] = empties[Math.floor(Math.random() * empties.length)];
       board[y][x] = Math.random() < 0.9 ? 2 : 4;
       return true;
@@ -985,13 +921,13 @@
       game.history.push({
         board: cloneBoard(game.board),
         score: game.score,
+        playerScores: [...game.playerScores],
+        currentPlayer: game.currentPlayer,
+        mode: game.mode,
         target: game.target,
-        size: game.size,
-        mode: game.mode
+        size: game.size
       });
-      if (game.history.length > 24) {
-        game.history.shift();
-      }
+      if (game.history.length > 24) game.history.shift();
     }
 
     function undoMove() {
@@ -1002,80 +938,65 @@
       }
       game.board = cloneBoard(prev.board);
       game.score = prev.score;
+      game.playerScores = [...prev.playerScores];
+      game.currentPlayer = prev.currentPlayer;
       game.target = prev.target;
       game.size = prev.size;
       game.mode = prev.mode;
       game.state = "playing";
+      game.aiBusy = false;
       els.modeSelect.value = game.mode;
       updateModeSettings();
       renderBoard();
       els.scoreValue.textContent = String(game.score);
       els.bestValue.textContent = String(game.best);
-      els.targetValue.textContent = String(game.target);
+      els.turnValue.textContent = getTurnLabel();
       validateBoard();
     }
 
     function renderBoard() {
-      const boardSize = game.size;
-      els.board.style.gridTemplateColumns = `repeat(${boardSize}, minmax(0, 1fr))`;
+      const size = game.size;
+      els.board.style.gridTemplateColumns = `repeat(${size}, minmax(0, 1fr))`;
       els.board.innerHTML = "";
 
-      const allCells = [];
-      for (let y = 0; y < boardSize; y++) {
-        for (let x = 0; x < boardSize; x++) {
+      const fragments = [];
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
           const cell = document.createElement("div");
           cell.className = "cell";
-          cell.style.position = "relative";
-          cell.style.borderRadius = "12px";
-          allCells.push(cell);
-
           const value = game.board[y][x];
           if (value !== 0) {
             const tile = document.createElement("div");
             tile.className = "tile";
             tile.dataset.value = String(value);
-            tile.textContent = value;
-            tile.style.background = getTileColor(value);
-            tile.style.fontSize = getTileFontSize(value);
-            tile.style.width = "100%";
-            tile.style.height = "100%";
+            tile.textContent = value === -1 ? "■" : value;
+            tile.style.background = value === -1 ? "linear-gradient(135deg, #7e88a6, #4e586f)" : getTileColor(value);
+            tile.style.fontSize = value === -1 ? "0.8rem" : getTileFontSize(value);
             cell.appendChild(tile);
           }
+          fragments.push(cell);
         }
       }
-
-      els.board.append(...allCells);
+      els.board.append(...fragments);
       els.scoreValue.textContent = String(game.score);
       els.bestValue.textContent = String(game.best);
-      els.targetValue.textContent = String(game.target);
-      validateBoard();
+      els.turnValue.textContent = getTurnLabel();
+      const targetValueEl = document.getElementById("targetValue");
+      if (targetValueEl) targetValueEl.textContent = String(game.target);
     }
 
     function getTileColor(value) {
       const palette = {
-        2: "var(--tile-2)",
-        4: "var(--tile-4)",
-        8: "var(--tile-8)",
-        16: "var(--tile-16)",
-        32: "var(--tile-32)",
-        64: "var(--tile-64)",
-        128: "var(--tile-128)",
-        256: "var(--tile-256)",
-        512: "var(--tile-512)",
-        1024: "var(--tile-1024)",
-        2048: "var(--tile-2048)",
-        4096: "var(--tile-4096)",
-        8192: "var(--tile-8192)",
-        16384: "var(--tile-16384)",
-        32768: "var(--tile-32768)",
-        65536: "var(--tile-65536)"
+        2: "var(--tile-2)", 4: "var(--tile-4)", 8: "var(--tile-8)", 16: "var(--tile-16)", 32: "var(--tile-32)", 64: "var(--tile-64)",
+        128: "var(--tile-128)", 256: "var(--tile-256)", 512: "var(--tile-512)", 1024: "var(--tile-1024)", 2048: "var(--tile-2048)",
+        4096: "var(--tile-4096)", 8192: "var(--tile-8192)", 16384: "var(--tile-16384)", 32768: "var(--tile-32768)", 65536: "var(--tile-65536)"
       };
-      return palette[value] || "linear-gradient(135deg, #2d2e3f, #0d1228)";
+      return palette[value] || "linear-gradient(135deg, #2b2f45, #101725)";
     }
 
     function getTileFontSize(value) {
-      if (value >= 32768) return "clamp(0.7rem, 1.5vw, 1rem)";
-      if (value >= 16384) return "clamp(0.8rem, 1.8vw, 1.15rem)";
+      if (value >= 32768) return "clamp(0.7rem, 1.4vw, 1rem)";
+      if (value >= 16384) return "clamp(0.8rem, 1.6vw, 1.12rem)";
       if (value >= 1024) return "clamp(0.9rem, 2vw, 1.35rem)";
       if (value >= 128) return "clamp(1rem, 2vw, 1.65rem)";
       if (value >= 8) return "clamp(1.1rem, 2vw, 1.8rem)";
@@ -1093,38 +1014,45 @@
         w: "up",
         s: "down"
       };
-
       const direction = map[event.key];
       if (!direction) return;
-
       event.preventDefault();
       move(direction);
     }
 
     function move(direction) {
       if (game.state === "lost") return;
+      if (game.mode === "ai" && game.aiBusy) return;
+      if (game.mode === "duel" && game.currentPlayer !== 0) {
+        showToast(i18n[game.lang].p2 + " turn");
+        return;
+      }
 
-      const previous = cloneBoard(game.board);
-      const { board, moved, gained } = shiftBoard(game.board, direction);
-
-      if (!moved) {
-        if (!hasAnyMove(game.board)) {
-          game.state = "lost";
-          showToast(i18n[game.lang].lost);
-        } else {
-          showToast(i18n[game.lang].noMoves);
-        }
+      const prev = cloneBoard(game.board);
+      const result = shiftBoard(game.board, direction);
+      if (!result.moved) {
+        if (!hasAnyMove(game.board)) finishGame();
+        else showToast(i18n[game.lang].noMoves);
         return;
       }
 
       pushHistory();
-
-      game.board = board;
-      game.score += gained;
-      game.best = Math.max(game.best, game.score);
+      game.board = result.board;
+      game.score += result.gained;
+      if (game.mode === "duel") {
+        game.playerScores[game.currentPlayer] += result.gained;
+        game.score = game.playerScores[game.currentPlayer];
+        game.best = Math.max(game.best, Math.max(...game.playerScores));
+      } else {
+        game.best = Math.max(game.best, game.score);
+      }
       localStorage.setItem(STORAGE_KEYS.best, String(game.best));
 
       spawnRandomTile(game.board);
+      if (game.mode === "duel") {
+        game.currentPlayer = 1 - game.currentPlayer;
+        game.score = game.playerScores[game.currentPlayer];
+      }
 
       if (game.score >= game.target && !game.wonOnce) {
         game.wonOnce = true;
@@ -1132,18 +1060,88 @@
       }
 
       if (!hasAnyMove(game.board)) {
-        game.state = "lost";
-        showToast(i18n[game.lang].lost);
-      }
-
-      if (game.score >= game.best) {
-        localStorage.setItem(STORAGE_KEYS.best, String(game.best));
+        finishGame();
       }
 
       renderBoard();
-
-      if (JSON.stringify(previous) === JSON.stringify(game.board)) {
+      if (JSON.stringify(prev) === JSON.stringify(game.board)) {
         showToast(i18n[game.lang].noMoves);
+      }
+
+      if (game.mode === "ai" && game.state === "playing") {
+        scheduleAiMove();
+      }
+    }
+
+    function scheduleAiMove() {
+      if (game.aiBusy || game.mode !== "ai") return;
+      game.aiBusy = true;
+      els.turnValue.textContent = i18n[game.lang].aiTurn;
+      setTimeout(() => {
+        const moveDir = chooseAiMove(game.board);
+        if (moveDir) {
+          const prev = cloneBoard(game.board);
+          const result = shiftBoard(game.board, moveDir);
+          if (result.moved) {
+            game.board = result.board;
+            game.score += result.gained;
+            game.best = Math.max(game.best, game.score);
+            spawnRandomTile(game.board);
+            if (game.score >= game.target && !game.wonOnce) {
+              game.wonOnce = true;
+              showToast(i18n[game.lang].won);
+            }
+          }
+          renderBoard();
+          if (!hasAnyMove(game.board)) finishGame();
+        }
+        game.aiBusy = false;
+        els.turnValue.textContent = getTurnLabel();
+      }, game.aiDelay);
+    }
+
+    function chooseAiMove(board) {
+      const directions = ["up", "down", "left", "right"];
+      let best = { dir: null, score: -Infinity };
+      directions.forEach((dir) => {
+        const cloned = cloneBoard(board);
+        const result = shiftBoard(cloned, dir);
+        if (!result.moved) return;
+        const score = evaluateBoard(result.board) + result.gained * 12;
+        if (score > best.score) best = { dir, score };
+      });
+      return best.dir;
+    }
+
+    function evaluateBoard(board) {
+      let score = 0;
+      for (let y = 0; y < board.length; y++) {
+        for (let x = 0; x < board[y].length; x++) {
+          const v = board[y][x];
+          if (v === 0) score += 6;
+          if (x + 1 < board[y].length) {
+            const next = board[y][x + 1];
+            if (v && next) score += Math.abs(v - next) * 0.4;
+          }
+          if (y + 1 < board.length) {
+            const down = board[y + 1][x];
+            if (v && down) score += Math.abs(v - down) * 0.4;
+          }
+          score += v * 0.5;
+        }
+      }
+      return score;
+    }
+
+    function finishGame() {
+      game.state = "lost";
+      if (game.mode === "duel") {
+        const p1 = game.playerScores[0];
+        const p2 = game.playerScores[1];
+        const result = p1 === p2 ? i18n[game.lang].draw : (p1 > p2 ? i18n[game.lang].duelWin + i18n[game.lang].p1 : i18n[game.lang].duelWin + i18n[game.lang].p2);
+        showToast(result);
+      } else {
+        showToast(i18n[game.lang].lost);
       }
     }
 
@@ -1176,11 +1174,10 @@
         while (idx < values.length) {
           const current = values[idx];
           const nextValue = values[idx + 1];
-
           if (nextValue === current && current !== 0) {
-            const result = current * 2;
-            merged.push(result);
-            gained += result;
+            const resultVal = current * 2;
+            merged.push(resultVal);
+            gained += resultVal;
             idx += 2;
           } else {
             merged.push(current);
@@ -1189,7 +1186,6 @@
         }
 
         while (merged.length < size) merged.push(0);
-
         line.forEach((pos, index) => {
           const raw = merged[index];
           const current = next[pos.y][pos.x];
@@ -1219,15 +1215,12 @@
         game.board = emptyBoard(game.size);
         return;
       }
-
       for (let y = 0; y < game.board.length; y++) {
-        if (!Array.isArray(game.board[y]) || game.board[y].length !== game.size) {
-          game.board[y] = Array(game.size).fill(0);
-        }
-
+        if (!Array.isArray(game.board[y]) || game.board[y].length !== game.size) game.board[y] = Array(game.size).fill(0);
         for (let x = 0; x < game.board[y].length; x++) {
           const v = game.board[y][x];
           if (!Number.isFinite(v) || v < 0) {
+            if (game.mode === "obstacle" && v === -1) continue;
             game.board[y][x] = 0;
           }
         }
@@ -1239,9 +1232,7 @@
       toast.textContent = msg;
       toast.classList.add("visible");
       clearTimeout(showToast.timer);
-      showToast.timer = setTimeout(() => {
-        toast.classList.remove("visible");
-      }, 1600);
+      showToast.timer = setTimeout(() => toast.classList.remove("visible"), 1700);
     }
 
     function toggleFullScreen() {
@@ -1264,7 +1255,6 @@
     function renderSaveModal() {
       const saved = getSaves();
       const dict = i18n[game.lang] || i18n["zh-Hant"];
-
       els.saveList.innerHTML = "";
       saveSlots.forEach((slot) => {
         const card = document.createElement("div");
@@ -1302,7 +1292,6 @@
         if (!saveInfo) loadBtn.style.opacity = "0.5";
 
         actions.append(saveBtn, loadBtn);
-
         card.append(meta, actions);
         els.saveList.appendChild(card);
       });
@@ -1310,8 +1299,7 @@
 
     function getSaves() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEYS.saveSlots);
-        return raw ? JSON.parse(raw) : {};
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.saveSlots) || "{}") || {};
       } catch (e) {
         return {};
       }
@@ -1325,9 +1313,10 @@
         size: game.size,
         target: game.target,
         mode: game.mode,
+        playerScores: [...game.playerScores],
+        currentPlayer: game.currentPlayer,
         savedAt: new Date().toISOString()
       };
-
       const saves = getSaves();
       saves[slot] = snapshot;
       localStorage.setItem(STORAGE_KEYS.saveSlots, JSON.stringify(saves));
@@ -1339,20 +1328,23 @@
       const saves = getSaves();
       const snapshot = saves[slot];
       if (!snapshot) return;
-
       game.board = cloneBoard(snapshot.board || emptyBoard(snapshot.size || 4));
       game.score = snapshot.score || 0;
       game.best = snapshot.best || 0;
       game.size = snapshot.size || 4;
       game.target = snapshot.target || 2048;
       game.mode = snapshot.mode || "classic";
+      game.playerScores = Array.isArray(snapshot.playerScores) ? [...snapshot.playerScores] : [0, 0];
+      game.currentPlayer = typeof snapshot.currentPlayer === "number" ? snapshot.currentPlayer : 0;
+      game.history = [];
+      game.aiBusy = false;
+      game.state = "playing";
       els.modeSelect.value = game.mode;
       updateModeSettings();
-      game.state = "playing";
       localStorage.setItem(STORAGE_KEYS.best, String(game.best));
-      showToast(i18n[game.lang].loaded);
       renderBoard();
       closeSaveModal();
+      showToast(i18n[game.lang].loaded);
     }
 
     document.addEventListener("DOMContentLoaded", init);
