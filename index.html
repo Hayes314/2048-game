@@ -553,7 +553,8 @@ function buildGridBg(){
   for (var r = 0; r < G.size; r++){
     for (var c = 0; c < G.size; c++){
       var d = document.createElement('div');
-      d.className = 'cell' + (isBlocker(r, c) ? ' blocker' : '');
+      var isBlk = isBlocker(r, c);
+      d.className = 'cell' + (isBlk ? ' blocker' : '');
       frag.appendChild(d);
     }
   }
@@ -600,12 +601,12 @@ function layout(side){
 }
 
 var lastSide = 0;
-function resize(){
+function resize(force){
   var rect = boardWrap.getBoundingClientRect();
   var side = Math.min(rect.width, rect.height);
   if (side < 80) side = Math.min(window.innerWidth * 0.92, 480);
   side = Math.max(180, side);
-  if (Math.abs(side - lastSide) < 0.5) return;
+  if (!force && Math.abs(side - lastSide) < 0.5) return;
   lastSide = side;
   boardEl.style.width  = side + 'px';
   boardEl.style.height = side + 'px';
@@ -675,8 +676,8 @@ function restoreState(snap){
     G.grid.push(row);
   }
 
-  var side = lastSide || boardEl.getBoundingClientRect().width || 300;
-  layout(side);
+  buildGridBg();
+  resize(true);
 
   for (var r2 = 0; r2 < G.size; r2++){
     for (var c2 = 0; c2 < G.size; c2++){
@@ -1023,7 +1024,7 @@ function newGame(cfg){
 
   tileLayerEl.innerHTML = '';
   buildGridBg();
-  resize();
+  resize(true);
 
   addRandomTile(true);
   addRandomTile(true);
@@ -1039,7 +1040,11 @@ function newGame(cfg){
   }
 
   closeOverlay();
-  checkGameState();
+  
+  requestAnimationFrame(function(){
+    resize(true);
+    checkGameState();
+  });
 }
 
 /* ==================== Mode buttons ==================== */
@@ -1195,7 +1200,7 @@ function showGameOver(reason){
   });
 }
 
-/* ==================== 存档 ==================== */
+/* ==================== 存檔 ==================== */
 function utf8ToB64(str){
   return btoa(unescape(encodeURIComponent(str)));
 }
@@ -1290,11 +1295,7 @@ function loadSnapshot(data){
 
   tileLayerEl.innerHTML = '';
   buildGridBg();
-
-  var side = lastSide || boardEl.getBoundingClientRect().width || 300;
-  boardEl.style.width  = side + 'px';
-  boardEl.style.height = side + 'px';
-  layout(side);
+  resize(true);
 
   for (var r4 = 0; r4 < G.size; r4++){
     for (var c4 = 0; c4 < G.size; c4++){
@@ -1326,7 +1327,7 @@ function loadSnapshot(data){
   setTimeout(checkGameState, 250);
 }
 
-/* ==================== 存档对话框 ==================== */
+/* ==================== 存檔對話框 ==================== */
 function openSaveDialog(){
   var code = serialize();
   var safeCode = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -1640,7 +1641,8 @@ function init(){
   applyLang(currentLang);
   applyTheme(currentTheme);
   requestAnimationFrame(function(){
-    resize();
+    resize(true);
+    // 開啟網頁時自動啟動新遊戲 (經典 4x4 模式)
     newGame({ size:4, target:2048, timeLimit:0, blockers:0, mode:'classic' });
   });
 }
