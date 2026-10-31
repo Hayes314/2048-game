@@ -1,1270 +1,1653 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-  <title>2048 Ultimate</title>
-  <style>
-    :root {
-      --bg-1: #f7f2ff;
-      --bg-2: #edf3ff;
-      --panel: rgba(255, 255, 255, 0.74);
-      --text: #2a2f43;
-      --muted: #687692;
-      --accent: #7a6af6;
-      --accent-2: #4dc9be;
-      --danger: #ff6b7a;
-      --board-bg: #b9aee8;
-      --cell-bg: rgba(255,255,255,0.26);
-      --shadow: 0 18px 50px rgba(40, 34, 78, 0.18);
-      --tile-2: #faf7ff;
-      --tile-4: #f0ecff;
-      --tile-8: #ffdcae;
-      --tile-16: #ffc780;
-      --tile-32: #ffae72;
-      --tile-64: #ff8d61;
-      --tile-128: #f6d767;
-      --tile-256: #f0c93d;
-      --tile-512: #d8b04a;
-      --tile-1024: #7f70f9;
-      --tile-2048: #6a5ef8;
-      --tile-4096: #49b39a;
-      --tile-8192: #2e9fc9;
-      --tile-16384: #d57dff;
-      --tile-32768: #ff5d90;
-      --tile-65536: #1f243a;
-      --obstacle: #7c8aa8;
-      --font: "Segoe UI", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", "Arial", sans-serif;
-    }
-
-    * { box-sizing: border-box; }
-
-    html, body {
-      width: 100%;
-      min-height: 100%;
-      margin: 0;
-      background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
-      color: var(--text);
-      font-family: var(--font);
-      overscroll-behavior: none;
-      overflow: hidden;
-      touch-action: none;
-      -webkit-user-select: none;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: clamp(10px,2vh,22px);
-    }
-
-    #app {
-      width: min(100%,600px);
-      min-height: min(94vh,940px);
-      background: var(--panel);
-      border: 1px solid rgba(255,255,255,0.55);
-      backdrop-filter: blur(14px);
-      border-radius: 30px;
-      box-shadow: var(--shadow);
-      padding: 18px 18px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .topbar, .toolbar, .status-row, .top-controls, .toolbar-group, .modal-header, .save-actions {
-      display: flex;
-      align-items: center;
-    }
-
-    .topbar {
-      justify-content: space-between;
-      min-height: 52px;
-      gap: 12px;
-    }
-
-    .brand {
-      font-size: clamp(1.5rem,2.4vw,2.2rem);
-      font-weight: 900;
-      letter-spacing: 0.05em;
-      color: var(--text);
-    }
-
-    .top-controls {
-      justify-content: flex-end;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .pill, button, select, input {
-      font: inherit;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255,255,255,0.45);
-      border: 1px solid rgba(255,255,255,0.6);
-      color: var(--text);
-      border-radius: 12px;
-      padding: 8px 10px;
-      min-height: 38px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    select, input[type="color"] {
-      background: rgba(255,255,255,0.8);
-      border: 1px solid rgba(138,146,179,0.28);
-      border-radius: 12px;
-      color: var(--text);
-      padding: 8px 10px;
-      outline: none;
-    }
-
-    select {
-      min-width: 116px;
-      appearance: none;
-      background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
-      background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
-      background-size: 6px 6px, 6px 6px;
-      background-repeat: no-repeat;
-      padding-right: 28px;
-    }
-
-    input[type="color"] {
-      width: 42px;
-      height: 38px;
-      min-width: 42px;
-      padding: 4px;
-      cursor: pointer;
-    }
-
-    .toolbar {
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .toolbar-group {
-      gap: 8px;
-      flex-wrap: wrap;
-      flex: 1;
-    }
-
-    .primary-btn, .secondary-btn, .icon-btn {
-      border: 0;
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: transform 0.16s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-      box-shadow: 0 10px 20px rgba(48,44,81,0.08);
-    }
-
-    .secondary-btn {
-      background: rgba(255,255,255,0.5);
-      color: var(--text);
-    }
-
-    .primary-btn {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: white;
-    }
-
-    .icon-btn {
-      width: 40px;
-      height: 40px;
-      padding: 0;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      background: rgba(255,255,255,0.56);
-      color: var(--text);
-    }
-
-    button:active { transform: translateY(1px) scale(0.99); }
-
-    .status-row {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
-      gap: 10px;
-    }
-
-    .score-box {
-      background: rgba(255,255,255,0.44);
-      border-radius: 16px;
-      padding: 10px 12px;
-      text-align: center;
-      border: 1px solid rgba(153,160,196,0.18);
-    }
-
-    .score-label {
-      display: block;
-      color: var(--muted);
-      font-size: 0.68rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-weight: 800;
-    }
-
-    .score-value {
-      display: block;
-      margin-top: 6px;
-      font-size: clamp(1.08rem, 2vw, 1.8rem);
-      font-weight: 900;
-      color: var(--text);
-    }
-
-    .board-shell {
-      padding: 12px;
-      border-radius: 28px;
-      background: rgba(255,255,255,0.26);
-      border: 1px solid rgba(150,157,194,0.12);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
-    }
-
-    .board {
-      position: relative;
-      display: grid;
-      gap: 10px;
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      background: var(--board-bg);
-      border-radius: 20px;
-      padding: 10px;
-      touch-action: none;
-      user-select: none;
-    }
-
-    .cell {
-      position: relative;
-      background: var(--cell-bg);
-      border-radius: 12px;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    .tile {
-      position: absolute;
-      inset: 0;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      color: rgba(30,35,48,0.86);
-      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.08), 0 5px 10px rgba(30,35,48,0.08);
-      animation: popIn 0.18s ease-out;
-      transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
-    }
-
-    .tile[data-value="2"], .tile[data-value="4"] { color: rgba(56,61,74,0.9); }
-    .tile[data-value="128"], .tile[data-value="256"], .tile[data-value="512"], .tile[data-value="1024"], .tile[data-value="2048"], .tile[data-value="4096"], .tile[data-value="8192"], .tile[data-value="16384"], .tile[data-value="32768"], .tile[data-value="65536"] { color: rgba(255,255,255,0.96); }
-    .tile.merged { animation: mergePulse 0.22s ease-out; }
-
-    @keyframes popIn {
-      0% { transform: scale(0.7); opacity: 0; }
-      70% { transform: scale(1.07); opacity: 1; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    @keyframes mergePulse {
-      0% { transform: scale(1); filter: brightness(1); }
-      50% { transform: scale(1.09); filter: brightness(1.1); }
-      100% { transform: scale(1); filter: brightness(1); }
-    }
-
-    .toast {
-      position: fixed;
-      left: 50%;
-      bottom: 22px;
-      transform: translateX(-50%) translateY(8px);
-      background: rgba(29,31,42,0.92);
-      color: white;
-      border-radius: 999px;
-      padding: 10px 14px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      box-shadow: 0 12px 24px rgba(18, 20, 31, 0.18);
-      z-index: 70;
-      max-width: min(80vw,420px);
-    }
-
-    .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(20, 22, 35, 0.56);
-      backdrop-filter: blur(10px);
-      z-index: 90;
-      opacity: 1;
-      transition: opacity 0.2s ease;
-      padding: 18px;
-    }
-
-    .modal-overlay.hidden { opacity: 0; pointer-events: none; }
-
-    .modal {
-      width: min(100%,530px);
-      background: rgba(255,255,255,0.95);
-      border-radius: 24px;
-      border: 1px solid rgba(150,157,194,0.32);
-      box-shadow: 0 22px 56px rgba(18,20,40,0.18);
-      padding: 18px 16px 16px;
-      color: var(--text);
-    }
-
-    .modal-header {
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .modal-header h3 { margin: 0; font-size: 1.2rem; }
-
-    .save-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .save-card {
-      background: rgba(245,247,255,0.9);
-      border-radius: 16px;
-      border: 1px solid rgba(160,168,204,0.26);
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .save-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      color: var(--muted);
-      font-size: 0.8rem;
-    }
-
-    .save-meta strong {
-      color: var(--text);
-      font-size: 1rem;
-    }
-
-    .save-actions {
-      gap: 8px;
-      margin-top: 4px;
-    }
-
-    .save-actions button {
-      flex: 1;
-      border: none;
-      border-radius: 10px;
-      font-weight: 800;
-      padding: 8px 10px;
-      cursor: pointer;
-    }
-
-    .save-slot {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #fff;
-    }
-
-    .load-slot {
-      background: rgba(255,255,255,0.72);
-      color: var(--text);
-    }
-
-    .hidden { display: none !important; }
-
-    @media (max-width: 560px) {
-      #app { border-radius: 0; width: 100%; min-height: 100%; padding: 14px 12px 12px; }
-      .topbar, .toolbar { align-items: stretch; }
-      .toolbar { gap: 8px; }
-      .toolbar-group { width: 100%; }
-      .top-controls { justify-content: flex-start; width: 100%; }
-      .secondary-btn, .primary-btn, .icon-btn { flex: 1; }
-      .board-shell { padding: 10px; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#faf8ef">
+<title>2048</title>
+<style>
+:root{
+  --page-bg:#faf8ef; --board-bg:#bbada0; --cell-bg:rgba(238,228,218,.35);
+  --text-main:#776e65; --text-sub:#9a9088; --panel-bg:#fff;
+  --accent:#f2b179; --accent-text:#fff;
+  --shadow:0 6px 20px rgba(0,0,0,.10);
+  --shadow-lg:0 24px 60px rgba(0,0,0,.32);
+  --radius:14px;
+}
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{
+  margin:0;padding:0;height:100%;height:100dvh;
+  overflow:hidden;overscroll-behavior:none;
+  position:fixed;inset:0;width:100%;
+  -webkit-text-size-adjust:100%;
+  touch-action:manipulation;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","PingFang SC","Microsoft JhengHei","Microsoft YaHei",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:var(--page-bg); color:var(--text-main);
+  display:flex; align-items:center; justify-content:center;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  transition:background-color .35s ease,color .35s ease;
+  user-select:none; -webkit-user-select:none;
+}
+.wrap{
+  width:min(92vw,480px);
+  height:100%;max-height:100%;
+  display:flex;flex-direction:column;gap:7px;
+  padding:7px 0;box-sizing:border-box;
+}
+.head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0}
+.logo{margin:0;font-size:clamp(26px,7.5vw,38px);font-weight:800;letter-spacing:-1px;color:var(--text-main);line-height:1}
+.scores{display:flex;gap:7px}
+.score-box{
+  position:relative;min-width:72px;padding:5px 10px 6px;
+  background:var(--panel-bg);border-radius:10px;text-align:center;
+  box-shadow:var(--shadow);transition:background-color .35s;
+}
+.score-label{display:block;font-size:9.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-sub);opacity:.9}
+.score-val{display:block;font-size:clamp(15px,4.4vw,20px);font-weight:800;color:var(--text-main);line-height:1.15;font-variant-numeric:tabular-nums}
+.score-box.bump .score-val{animation:bump .3s ease}
+@keyframes bump{0%{transform:scale(1)}45%{transform:scale(1.2)}100%{transform:scale(1)}}
+.modes{display:flex;gap:4px;background:var(--cell-bg);padding:4px;border-radius:11px;flex-shrink:0}
+.mode-btn{
+  flex:1;border:0;background:transparent;color:var(--text-main);
+  font:inherit;font-size:clamp(10.5px,3vw,12.5px);font-weight:700;
+  padding:7px 1px;border-radius:7px;cursor:pointer;
+  transition:background-color .22s,color .22s,transform .12s;
+  white-space:nowrap;min-height:34px;
+}
+.mode-btn:active{transform:scale(.96)}
+.mode-btn.active{background:var(--panel-bg);box-shadow:0 2px 8px rgba(0,0,0,.10)}
+.timer-row{display:none;align-items:center;gap:8px;height:16px;padding:0 2px;flex-shrink:0}
+.timer-row.on{display:flex}
+.timer-track{flex:1;height:6px;border-radius:99px;background:var(--cell-bg);overflow:hidden}
+.timer-fill{
+  height:100%;width:100%;border-radius:99px;
+  background:linear-gradient(90deg,#6ec26e,#a8d84a);
+  transform-origin:left center;transform:scaleX(1);
+  transition:background .3s;
+}
+.timer-fill.warn{background:linear-gradient(90deg,#f0a03c,#f6c244)}
+.timer-fill.danger{background:linear-gradient(90deg,#e8564a,#f5805a);animation:pulse .7s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+.timer-text{font-size:11px;font-weight:800;color:var(--text-sub);min-width:36px;text-align:right;font-variant-numeric:tabular-nums}
+.board-wrap{
+  flex:1;min-height:0;min-width:0;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.board{
+  position:relative;
+  width:300px;height:300px;max-width:100%;max-height:100%;
+  aspect-ratio:1;
+  background:var(--board-bg);
+  border-radius:var(--radius);
+  box-shadow:0 10px 30px rgba(0,0,0,.13);
+  touch-action:none;
+  overflow:hidden;
+  transition:background-color .35s;
+  contain:layout style paint;
+}
+.grid-bg,.tile-layer{position:absolute;inset:0;pointer-events:none}
+.cell{
+  position:absolute;top:0;left:0;
+  background:var(--cell-bg);
+  border-radius:7px;
+  transition:background-color .35s;
+}
+.cell.blocker{
+  background:repeating-linear-gradient(45deg,rgba(0,0,0,.18) 0 5px,rgba(0,0,0,.28) 5px 10px);
+  box-shadow:inset 0 0 0 2px rgba(0,0,0,.12);
+}
+.tile{
+  position:absolute;top:0;left:0;
+  will-change:transform;
+  transition:transform 100ms cubic-bezier(.25,.1,.25,1);
+  z-index:2;
+}
+.tile-inner{
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.5px;
+  border-radius:7px;
+  transition:background-color .18s ease,color .18s ease;
+  will-change:transform;backface-visibility:hidden;
+}
+.anim-appear{animation:appear 150ms cubic-bezier(.2,.9,.3,1.4)}
+@keyframes appear{from{transform:scale(.15);opacity:0}to{transform:scale(1);opacity:1}}
+.anim-pop{animation:pop 190ms cubic-bezier(.2,.9,.3,1.4)}
+@keyframes pop{0%{transform:scale(1)}48%{transform:scale(1.22)}100%{transform:scale(1)}}
+.controls{display:flex;gap:5px;flex-shrink:0}
+.btn{
+  border:0;cursor:pointer;font:inherit;font-weight:700;font-size:clamp(10.5px,3vw,12.5px);
+  padding:10px 4px;border-radius:10px;background:var(--panel-bg);color:var(--text-main);
+  box-shadow:var(--shadow);
+  transition:transform .12s,background-color .22s,box-shadow .22s,opacity .2s;
+  white-space:nowrap;flex:1;min-height:40px;
+}
+.btn:active{transform:scale(.96)}
+.btn.primary{background:var(--accent);color:var(--accent-text)}
+.btn:disabled{opacity:.35;cursor:default;pointer-events:none;box-shadow:none}
+.settings{display:flex;gap:6px;flex-shrink:0}
+.sel{
+  flex:1;border:0;cursor:pointer;font:inherit;font-weight:700;font-size:clamp(11px,3vw,12.5px);
+  padding:10px 22px 10px 8px;border-radius:10px;background:var(--panel-bg);color:var(--text-main);
+  box-shadow:var(--shadow);appearance:none;-webkit-appearance:none;
+  text-align:center;text-align-last:center;
+  transition:background-color .22s,color .22s;
+  background-image:linear-gradient(45deg,transparent 50%,var(--text-sub) 50%),linear-gradient(135deg,var(--text-sub) 50%,transparent 50%);
+  background-position:calc(100% - 12px) center,calc(100% - 7px) center;
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat;
+  min-height:40px;
+}
+.sel:focus{outline:2px solid var(--accent);outline-offset:1px}
+.hint{text-align:center;font-size:11px;color:var(--text-sub);opacity:.85;letter-spacing:.2px;flex-shrink:0}
+.overlay{
+  position:fixed;inset:0;z-index:100;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(30,26,22,.55);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  padding:20px;
+  opacity:0;pointer-events:none;
+  transition:opacity .26s ease;
+}
+.overlay.show{opacity:1;pointer-events:auto}
+.dialog{
+  width:min(92vw,400px);max-height:88dvh;overflow-y:auto;
+  background:var(--panel-bg);border-radius:18px;
+  padding:22px 20px 18px;
+  box-shadow:var(--shadow-lg);
+  transform:scale(.9) translateY(10px);
+  transition:transform .28s cubic-bezier(.2,.9,.3,1.35);
+  color:var(--text-main);
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+}
+.overlay.show .dialog{transform:scale(1) translateY(0)}
+.dialog h2{margin:0 0 8px;font-size:21px;font-weight:800;letter-spacing:-.3px}
+.dialog p{margin:0 0 10px;font-size:13px;color:var(--text-sub);line-height:1.6}
+.ov-score{
+  font-size:32px;font-weight:900;letter-spacing:-1px;
+  text-align:center;margin:4px 0 16px;color:var(--text-main);
+}
+.ov-score small{display:block;font-size:10.5px;font-weight:700;letter-spacing:1px;color:var(--text-sub);margin-bottom:2px}
+.dialog-btns{display:flex;gap:8px;margin-top:6px}
+.dialog-btns .btn{flex:1;box-shadow:none;background:var(--cell-bg);padding:11px 8px}
+.dialog-btns .btn.primary{background:var(--accent);color:var(--accent-text)}
+.field{margin-bottom:14px}
+.field>label{display:block;font-size:11.5px;font-weight:800;letter-spacing:.4px;color:var(--text-sub);margin-bottom:7px;text-transform:uppercase}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{
+  border:0;cursor:pointer;font:inherit;font-weight:700;font-size:12.5px;
+  padding:8px 12px;border-radius:9px;background:var(--cell-bg);color:var(--text-main);
+  transition:background-color .2s,color .2s,transform .1s;
+}
+.chip:active{transform:scale(.95)}
+.chip.active{background:var(--accent);color:var(--accent-text)}
+.save-code{
+  width:100%;
+  border:1px solid rgba(0,0,0,.12);
+  border-radius:8px;
+  padding:8px 10px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:11px;
+  line-height:1.5;
+  background:var(--page-bg);
+  color:var(--text-main);
+  resize:none;
+  margin-bottom:6px;
+  word-break:break-all;
+  white-space:pre-wrap;
+  box-sizing:border-box;
+}
+.save-code:focus{outline:2px solid var(--accent);outline-offset:0}
+.divider{height:1px;background:var(--cell-bg);margin:14px 0}
+@media (max-width:380px){
+  .score-box{min-width:62px;padding:4px 7px}
+  .btn{padding:9px 2px;font-size:10.5px}
+  .sel{font-size:11px;padding:9px 18px 9px 4px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
 </head>
 <body>
-  <div id="app">
-    <div class="topbar">
-      <div class="brand" data-text="title">2048</div>
-      <div class="top-controls">
-        <div class="pill" data-text="colors">Theme</div>
-        <input id="themeBgInput" type="color" aria-label="Background color" />
-        <input id="themePanelInput" type="color" aria-label="Panel color" />
-        <input id="themeAccentInput" type="color" aria-label="Accent color" />
-      </div>
-    </div>
 
-    <div class="toolbar">
-      <div class="toolbar-group">
-        <label class="pill" data-text="mode">Mode</label>
-        <select id="modeSelect" aria-label="Game mode">
-          <option value="classic" data-text="classic">Classic 2048</option>
-          <option value="obstacle" data-text="obstacle">Obstacle</option>
-          <option value="custom" data-text="custom">Custom</option>
-        </select>
-
-        <div id="obstacleControls" class="toolbar-group hidden">
-          <label class="pill" data-text="difficulty">Difficulty</label>
-          <select id="difficultySelect">
-            <option value="easy" data-text="easy">Easy</option>
-            <option value="normal" data-text="normal" selected>Normal</option>
-            <option value="hard" data-text="hard">Hard</option>
-          </select>
-        </div>
-
-        <div id="customSettings" class="toolbar-group hidden">
-          <label class="pill" data-text="boardSize">Board</label>
-          <select id="customSizeSelect">
-            <option value="4">4 x 4</option>
-            <option value="5">5 x 5</option>
-            <option value="6">6 x 6</option>
-          </select>
-          <label class="pill" data-text="target">Target</label>
-          <select id="customTargetSelect">
-            <option value="1024">1024</option>
-            <option value="2048">2048</option>
-            <option value="4096" selected>4096</option>
-            <option value="8192">8192</option>
-            <option value="16384">16384</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="toolbar-group">
-        <button class="secondary-btn" id="undoBtn" data-text="undo">Undo</button>
-        <button class="secondary-btn" id="restartBtn" data-text="restart">Restart</button>
-        <button class="primary-btn" id="saveBtn" data-text="save">Save</button>
-        <button class="icon-btn" id="fullscreenBtn" title="Full Screen">⛶</button>
-      </div>
-    </div>
-
-    <div class="status-row">
-      <div class="score-box">
-        <span class="score-label" data-text="score">Score</span>
-        <span class="score-value" id="scoreValue">0</span>
+<div class="wrap">
+  <header class="head">
+    <h1 class="logo">2048</h1>
+    <div class="scores">
+      <div class="score-box" id="scoreBox">
+        <span class="score-label" data-i18n="score">分數</span>
+        <span class="score-val" id="scoreVal">0</span>
       </div>
       <div class="score-box">
-        <span class="score-label" data-text="best">Best</span>
-        <span class="score-value" id="bestValue">0</span>
-      </div>
-      <div class="score-box">
-        <span class="score-label" data-text="target">Target</span>
-        <span class="score-value" id="targetValue">2048</span>
+        <span class="score-label" data-i18n="best">最高分</span>
+        <span class="score-val" id="bestVal">0</span>
       </div>
     </div>
+  </header>
 
-    <div class="board-shell">
-      <div class="board" id="board" aria-label="2048 game board"></div>
-    </div>
+  <div class="modes" id="modeBar">
+    <button class="mode-btn" data-mode="classic" data-i18n="mClassic">經典</button>
+    <button class="mode-btn" data-mode="timed"   data-i18n="mTimed">限時</button>
+    <button class="mode-btn" data-mode="blocker" data-i18n="mBlocker">障礙</button>
+    <button class="mode-btn" data-mode="custom"  data-i18n="mCustom">自訂</button>
+  </div>
 
-    <div class="top-controls" style="justify-content:flex-start;">
-      <label class="pill" data-text="language">Language</label>
-      <select id="langSelect">
-        <option value="zh-Hant">繁體中文</option>
-        <option value="zh-CN">简体中文</option>
-        <option value="en">English</option>
-      </select>
+  <div class="timer-row" id="timerRow">
+    <div class="timer-track"><div class="timer-fill" id="timerFill"></div></div>
+    <div class="timer-text" id="timerText">--</div>
+  </div>
+
+  <div class="board-wrap" id="boardWrap">
+    <div class="board" id="board">
+      <div class="grid-bg" id="gridBg"></div>
+      <div class="tile-layer" id="tileLayer"></div>
     </div>
   </div>
 
-  <div class="toast" id="toast"></div>
-
-  <div class="modal-overlay hidden" id="saveModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 data-text="savedGames">Saved Games</h3>
-        <button class="secondary-btn" id="closeSaveModal" data-text="close">Close</button>
-      </div>
-      <div class="save-list" id="saveList"></div>
-    </div>
+  <div class="controls">
+    <button class="btn" id="undoBtn" data-i18n="undo" disabled>復原</button>
+    <button class="btn" id="saveBtn" data-i18n="save">存檔</button>
+    <button class="btn" id="newBtn" data-i18n="newGame">新遊戲</button>
+    <button class="btn primary" id="restartBtn" data-i18n="restart">重新開始</button>
   </div>
 
-  <script>
-    const STORAGE_KEYS = { best: "2048BestScoreV1", saveSlots: "2048SaveSlotsV1", language: "2048LanguageV1", theme: "2048ThemeV1" };
+  <div class="settings">
+    <select class="sel" id="themeSel" aria-label="theme"></select>
+    <select class="sel" id="langSel" aria-label="language"></select>
+  </div>
 
-    const i18n = {
-      "zh-Hant": {
-        title: "2048",
-        colors: "調色系",
-        mode: "玩法",
-        classic: "經典 2048",
-        obstacle: "障礙模式",
-        custom: "自定義",
-        difficulty: "難度",
-        easy: "簡單",
-        normal: "普通",
-        hard: "困難",
-        boardSize: "棋盤大小",
-        target: "目標值",
-        score: "分數",
-        best: "最佳",
-        undo: "回復上一步",
-        restart: "重新開始",
-        save: "存檔",
-        close: "關閉",
-        savedGames: "存檔列表",
-        language: "語言",
-        empty: "空",
-        newSave: "新存檔",
-        load: "讀取",
-        overwrite: "覆蓋",
-        noMoves: "目前不能移動",
-        saved: "已存檔",
-        loaded: "已讀取",
-        won: "已達目標，繼續挑戰更高分！",
-        lost: "遊戲結束，沒有可移動的空間。",
-        restartConfirm: "確定要重新開始嗎？",
-        noHistory: "沒有可回復的步驟",
-        fullscreen: "全螢幕",
-        obstacleGoal: "目標：達到 {target} 並清掉障礙",
-        obstacles: "障礙",
-        obstacleBlocked: "障礙格不能移動或合併",
-        goalComplete: "任務達成：障礙已清除！"
-      },
-      "zh-CN": {
-        title: "2048",
-        colors: "调色系",
-        mode: "玩法",
-        classic: "经典 2048",
-        obstacle: "障碍模式",
-        custom: "自定义",
-        difficulty: "难度",
-        easy: "简单",
-        normal: "普通",
-        hard: "困难",
-        boardSize: "棋盘大小",
-        target: "目标值",
-        score: "分数",
-        best: "最佳",
-        undo: "恢复上一步",
-        restart: "重新开始",
-        save: "存档",
-        close: "关闭",
-        savedGames: "存档列表",
-        language: "语言",
-        empty: "空",
-        newSave: "新存档",
-        load: "读取",
-        overwrite: "覆盖",
-        noMoves: "目前不能移动",
-        saved: "已存档",
-        loaded: "已读取",
-        won: "已达目标，继续挑战更高分！",
-        lost: "游戏结束，没有可移动的空间。",
-        restartConfirm: "确定要重新开始吗？",
-        noHistory: "没有可恢复的步骤",
-        fullscreen: "全屏",
-        obstacleGoal: "目标：达到 {target} 并清掉障碍",
-        obstacles: "障碍",
-        obstacleBlocked: "障碍格不能移动或合并",
-        goalComplete: "任务达成：障碍已清除！"
-      },
-      en: {
-        title: "2048",
-        colors: "Theme",
-        mode: "Mode",
-        classic: "Classic 2048",
-        obstacle: "Obstacle Mode",
-        custom: "Custom",
-        difficulty: "Difficulty",
-        easy: "Easy",
-        normal: "Normal",
-        hard: "Hard",
-        boardSize: "Board",
-        target: "Target",
-        score: "Score",
-        best: "Best",
-        undo: "Undo",
-        restart: "Restart",
-        save: "Save",
-        close: "Close",
-        savedGames: "Saved Games",
-        language: "Language",
-        empty: "Empty",
-        newSave: "New Save",
-        load: "Load",
-        overwrite: "Overwrite",
-        noMoves: "No moves available",
-        saved: "Saved",
-        loaded: "Loaded",
-        won: "Goal reached! Keep going!",
-        lost: "No more moves available.",
-        restartConfirm: "Restart the game?",
-        noHistory: "Nothing to undo",
-        fullscreen: "Full Screen",
-        obstacleGoal: "Goal: reach {target} and clear obstacles",
-        obstacles: "Obstacles",
-        obstacleBlocked: "Obstacles cannot move or merge",
-        goalComplete: "Mission complete: all obstacles cleared!"
+  <div class="hint" data-i18n="hint">方向鍵 / WASD / 滑動來移動方塊</div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ==================== i18n ==================== */
+var I18N = {
+  'zh-Hant': {
+    score:'分數', best:'最高分', newGame:'新遊戲', restart:'重新開始', undo:'復原', save:'存檔',
+    mClassic:'經典', mTimed:'限時', mBlocker:'障礙', mCustom:'自訂',
+    hint:'方向鍵 / WASD / 滑動來移動方塊',
+    gameOver:'遊戲結束', timeUp:'時間到！', win:'達成目標！',
+    winDesc:'你合成了 {n}！要繼續挑戰嗎？',
+    overDesc:'沒有可以移動的方塊了',
+    finalScore:'最終分數',
+    keepGoing:'繼續玩', cancel:'取消', close:'關閉',
+    customTitle:'自訂玩法', boardSize:'棋盤大小', target:'目標數字',
+    blockers:'障礙方塊', timeLimit:'時間限制', none:'無', start:'開始遊戲',
+    themeClassic:'經典', themeNeon:'霓虹', themeForest:'森林', themeOcean:'海洋', themeCandy:'糖果',
+    langName:'繁體中文',
+    saveTitle:'存檔代碼', saveDesc:'複製以下代碼保存你的進度：',
+    copy:'複製', copied:'已複製！',
+    loadDesc:'或貼上存檔代碼來讀取進度：', loadBtn:'讀取',
+    loadError:'代碼無效'
+  },
+  'zh-Hans': {
+    score:'分数', best:'最高分', newGame:'新游戏', restart:'重新开始', undo:'撤销', save:'存档',
+    mClassic:'经典', mTimed:'限时', mBlocker:'障碍', mCustom:'自定义',
+    hint:'方向键 / WASD / 滑动来移动方块',
+    gameOver:'游戏结束', timeUp:'时间到！', win:'达成目标！',
+    winDesc:'你合成了 {n}！要继续挑战吗？',
+    overDesc:'没有可以移动的方块了',
+    finalScore:'最终分数',
+    keepGoing:'继续玩', cancel:'取消', close:'关闭',
+    customTitle:'自定义玩法', boardSize:'棋盘大小', target:'目标数字',
+    blockers:'障碍方块', timeLimit:'时间限制', none:'无', start:'开始游戏',
+    themeClassic:'经典', themeNeon:'霓虹', themeForest:'森林', themeOcean:'海洋', themeCandy:'糖果',
+    langName:'简体中文',
+    saveTitle:'存档代码', saveDesc:'复制以下代码保存你的进度：',
+    copy:'复制', copied:'已复制！',
+    loadDesc:'或粘贴存档代码来读取进度：', loadBtn:'读取',
+    loadError:'代码无效'
+  },
+  'en': {
+    score:'SCORE', best:'BEST', newGame:'New Game', restart:'Restart', undo:'Undo', save:'Save',
+    mClassic:'Classic', mTimed:'Timed', mBlocker:'Blockers', mCustom:'Custom',
+    hint:'Arrow keys / WASD / swipe to move tiles',
+    gameOver:'Game Over', timeUp:"Time's Up!", win:'Goal Reached!',
+    winDesc:'You made {n}! Keep going?',
+    overDesc:'No more moves available',
+    finalScore:'Final Score',
+    keepGoing:'Keep Going', cancel:'Cancel', close:'Close',
+    customTitle:'Custom Mode', boardSize:'Board Size', target:'Target Tile',
+    blockers:'Blockers', timeLimit:'Time Limit', none:'None', start:'Start Game',
+    themeClassic:'Classic', themeNeon:'Neon', themeForest:'Forest', themeOcean:'Ocean', themeCandy:'Candy',
+    langName:'English',
+    saveTitle:'Save Code', saveDesc:'Copy the code below to save your progress:',
+    copy:'Copy', copied:'Copied!',
+    loadDesc:'Or paste a save code to load progress:', loadBtn:'Load',
+    loadError:'Invalid code'
+  }
+};
+
+var LANGS = ['zh-Hant','zh-Hans','en'];
+var currentLang = 'zh-Hant';
+try { currentLang = localStorage.getItem('g2048_lang') || ''; } catch(e){}
+if (LANGS.indexOf(currentLang) < 0){
+  var nav = (navigator.language || '').toLowerCase();
+  currentLang = (nav.indexOf('zh-tw') === 0 || nav.indexOf('zh-hk') === 0 || nav.indexOf('hant') >= 0) ? 'zh-Hant'
+              : nav.indexOf('zh') === 0 ? 'zh-Hans' : 'en';
+}
+function t(key, vars){
+  var s = (I18N[currentLang] && I18N[currentLang][key]) || key;
+  if (vars) for (var k in vars) s = s.split('{'+k+'}').join(vars[k]);
+  return s;
+}
+
+/* ==================== Themes ==================== */
+var THEMES = {
+  classic: {
+    vars:{'--page-bg':'#faf8ef','--board-bg':'#bbada0','--cell-bg':'rgba(238,228,218,.35)',
+          '--text-main':'#776e65','--text-sub':'#9a9088','--panel-bg':'#ffffff',
+          '--accent':'#f2b179','--accent-text':'#ffffff',
+          '--shadow':'0 6px 20px rgba(0,0,0,.10)','--shadow-lg':'0 24px 60px rgba(0,0,0,.32)'},
+    palette:['#eee4da','#ede0c8','#f2b179','#f59563','#f67c5f','#f65e3b',
+             '#edcf72','#edcc61','#edc850','#edc53f','#edc22e','#3c3a32','#2b2a25','#1f1e1a']
+  },
+  neon: {
+    vars:{'--page-bg':'#0d1224','--board-bg':'#182140','--cell-bg':'rgba(255,255,255,.06)',
+          '--text-main':'#e8eeff','--text-sub':'#8c9bc4','--panel-bg':'#1c2547',
+          '--accent':'#3fd6c0','--accent-text':'#062018',
+          '--shadow':'0 6px 20px rgba(0,0,0,.5)','--shadow-lg':'0 24px 60px rgba(0,0,0,.7)'},
+    palette:['#233056','#2c3f70','#36518f','#3f66b0','#3f86d6','#3fa8d6',
+             '#3fd6c0','#3fd68a','#6ad63f','#d6d63f','#d6a03f','#d6683f','#d63f7a','#a03fd6']
+  },
+  forest: {
+    vars:{'--page-bg':'#eef5e6','--board-bg':'#7d9a63','--cell-bg':'rgba(255,255,255,.28)',
+          '--text-main':'#3d5230','--text-sub':'#7d8f6e','--panel-bg':'#ffffff',
+          '--accent':'#6caa48','--accent-text':'#ffffff',
+          '--shadow':'0 6px 20px rgba(0,0,0,.10)','--shadow-lg':'0 24px 60px rgba(0,0,0,.32)'},
+    palette:['#d8e8c8','#c0dca8','#a4cc84','#88bc64','#6caa48','#529a34',
+             '#3d8828','#2f701f','#245a18','#1a4412','#12300c','#0d2209','#081806','#050f04']
+  },
+  ocean: {
+    vars:{'--page-bg':'#eaf3fa','--board-bg':'#7aa5c4','--cell-bg':'rgba(255,255,255,.30)',
+          '--text-main':'#244a63','--text-sub':'#7493a8','--panel-bg':'#ffffff',
+          '--accent':'#3a8cbe','--accent-text':'#ffffff',
+          '--shadow':'0 6px 20px rgba(0,0,0,.10)','--shadow-lg':'0 24px 60px rgba(0,0,0,.32)'},
+    palette:['#cfe4f0','#b4d6ea','#94c6e2','#74b4d8','#54a0cc','#3a8cbe',
+             '#2a78ac','#1e6498','#165084','#0f3e6e','#0a2e58','#072244','#041832','#020f20']
+  },
+  candy: {
+    vars:{'--page-bg':'#fdeef4','--board-bg':'#d989ab','--cell-bg':'rgba(255,255,255,.36)',
+          '--text-main':'#7a2f52','--text-sub':'#b07d97','--panel-bg':'#ffffff',
+          '--accent':'#ff68a5','--accent-text':'#ffffff',
+          '--shadow':'0 6px 20px rgba(0,0,0,.10)','--shadow-lg':'0 24px 60px rgba(0,0,0,.32)'},
+    palette:['#ffe0ec','#ffc8de','#ffa8cb','#ff88b8','#ff68a5','#ff4892',
+             '#f0287f','#d8186c','#b80e5a','#980848','#780438','#58022a','#3a011c','#200010']
+  }
+};
+var THEME_KEYS = ['classic','neon','forest','ocean','candy'];
+var THEME_LABEL = { classic:'themeClassic', neon:'themeNeon', forest:'themeForest', ocean:'themeOcean', candy:'themeCandy' };
+var currentTheme = 'classic';
+try { currentTheme = localStorage.getItem('g2048_theme') || 'classic'; } catch(e){}
+if (!THEMES[currentTheme]) currentTheme = 'classic';
+
+var _colorCache = {};
+function textColorFor(hex){
+  if (_colorCache[hex]) return _colorCache[hex];
+  var n = parseInt(hex.slice(1), 16);
+  var r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  var lum = (0.299*r + 0.587*g + 0.114*b) / 255;
+  var c = lum > 0.62 ? '#3a3330' : '#f9f6f2';
+  _colorCache[hex] = c;
+  return c;
+}
+
+/* ==================== DOM ==================== */
+var boardEl     = document.getElementById('board');
+var boardWrap   = document.getElementById('boardWrap');
+var gridBgEl    = document.getElementById('gridBg');
+var tileLayerEl = document.getElementById('tileLayer');
+var scoreValEl  = document.getElementById('scoreVal');
+var bestValEl   = document.getElementById('bestVal');
+var scoreBoxEl  = document.getElementById('scoreBox');
+var overlayEl   = document.getElementById('overlay');
+var modeBarEl   = document.getElementById('modeBar');
+var timerRowEl  = document.getElementById('timerRow');
+var timerFillEl = document.getElementById('timerFill');
+var timerTextEl = document.getElementById('timerText');
+var newBtnEl    = document.getElementById('newBtn');
+var restartBtnEl= document.getElementById('restartBtn');
+var undoBtnEl   = document.getElementById('undoBtn');
+var saveBtnEl   = document.getElementById('saveBtn');
+var themeSelEl  = document.getElementById('themeSel');
+var langSelEl   = document.getElementById('langSel');
+
+/* ==================== State ==================== */
+var G = {
+  size: 4,
+  grid: [],
+  blockers: [],
+  score: 0,
+  best: 0,
+  mode: 'classic',
+  target: 2048,
+  timeLimit: 0,
+  timeLeft: 0,
+  running: false,
+  won: false,
+  over: false,
+  locked: false,
+  nextId: 1,
+  cell: 60, gap: 8, pad: 8,
+  lastConfig: { size:4, target:2048, timeLimit:0, blockers:0, mode:'classic' }
+};
+try { G.best = parseInt(localStorage.getItem('g2048_best') || '0', 10) || 0; } catch(e){ G.best = 0; }
+
+var MOVE_DURATION = 100;
+var moveQueue = [];
+var timerInterval = null;
+var timerEndAt = 0;
+var history = [];
+var MAX_HISTORY = 20;
+var actionId = 0;
+
+/* ==================== Tile ==================== */
+function newTile(value, row, col){
+  return { id: G.nextId++, value: value, row: row, col: col, el: null };
+}
+function sizeTile(tl){
+  if (!tl.el) return;
+  var s = G.cell;
+  tl.el.style.width  = s + 'px';
+  tl.el.style.height = s + 'px';
+  var inner = tl.el.firstChild;
+  if (inner) inner.style.borderRadius = Math.max(4, s * 0.14) + 'px';
+}
+function positionTile(tl){
+  if (!tl.el) return;
+  var x = G.pad + tl.col * (G.cell + G.gap);
+  var y = G.pad + tl.row * (G.cell + G.gap);
+  tl.el.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
+}
+function updateTileFace(tl){
+  if (!tl.el) return;
+  var inner = tl.el.firstChild;
+  if (!inner) return;
+  var pal = THEMES[currentTheme].palette;
+  var idx = Math.round(Math.log(tl.value) / Math.LN2) - 1;
+  if (idx < 0) idx = 0;
+  if (idx >= pal.length) idx = pal.length - 1;
+  var bg = pal[idx];
+  inner.style.background = bg;
+  inner.style.color = textColorFor(bg);
+
+  var str = String(tl.value);
+  var digits = str.length;
+  var ratio = 0.44;
+  if (digits === 3) ratio = 0.36;
+  else if (digits === 4) ratio = 0.29;
+  else if (digits === 5) ratio = 0.235;
+  else if (digits >= 6) ratio = 0.19;
+
+  inner.style.fontSize = Math.max(8, G.cell * ratio) + 'px';
+  if (inner.textContent !== str) inner.textContent = str;
+}
+function ensureTileEl(tl, animClass){
+  if (tl.el && tl.el.parentNode === tileLayerEl){
+    positionTile(tl);
+    updateTileFace(tl);
+    return tl.el;
+  }
+  var el = document.createElement('div');
+  el.className = 'tile';
+  el.style.transition = 'none';
+  var inner = document.createElement('div');
+  inner.className = 'tile-inner';
+  el.appendChild(inner);
+  tl.el = el;
+
+  sizeTile(tl);
+  positionTile(tl);
+  updateTileFace(tl);
+  tileLayerEl.appendChild(el);
+
+  requestAnimationFrame(function(){
+    if (el.parentNode) el.style.transition = '';
+  });
+
+  if (animClass){
+    inner.classList.add(animClass);
+    inner.addEventListener('animationend', function(){
+      inner.classList.remove(animClass);
+    }, { once: true });
+  }
+  return el;
+}
+
+/* ==================== Helpers ==================== */
+function isBlocker(r, c){
+  return !!(G.blockers[r] && G.blockers[r][c]);
+}
+function emptyCells(){
+  var out = [];
+  for (var r = 0; r < G.size; r++){
+    for (var c = 0; c < G.size; c++){
+      if (!G.grid[r][c] && !isBlocker(r, c)) out.push({ r: r, c: c });
+    }
+  }
+  return out;
+}
+function addRandomTile(withAnim){
+  var cells = emptyCells();
+  if (!cells.length) return null;
+  var pos = cells[(Math.random() * cells.length) | 0];
+  var tl = newTile(Math.random() < 0.9 ? 2 : 4, pos.r, pos.c);
+  G.grid[pos.r][pos.c] = tl;
+  ensureTileEl(tl, withAnim ? 'anim-appear' : null);
+  return tl;
+}
+
+/* ==================== Layout ==================== */
+function buildGridBg(){
+  gridBgEl.innerHTML = '';
+  var frag = document.createDocumentFragment();
+  for (var r = 0; r < G.size; r++){
+    for (var c = 0; c < G.size; c++){
+      var d = document.createElement('div');
+      d.className = 'cell' + (isBlocker(r, c) ? ' blocker' : '');
+      frag.appendChild(d);
+    }
+  }
+  gridBgEl.appendChild(frag);
+}
+
+function layout(side){
+  if (!G.size) return;
+  var W = side || boardEl.getBoundingClientRect().width || 300;
+  var size = G.size;
+
+  var gap = Math.max(3, Math.round(W * 0.021));
+  var pad = gap;
+  var cell = (W - 2 * pad - (size - 1) * gap) / size;
+
+  G.gap = gap;
+  G.pad = pad;
+  G.cell = cell;
+
+  var cells = gridBgEl.children;
+  var i = 0;
+  for (var r = 0; r < size; r++){
+    for (var c = 0; c < size; c++){
+      var el = cells[i++];
+      if (!el) continue;
+      el.style.width  = cell + 'px';
+      el.style.height = cell + 'px';
+      el.style.transform = 'translate3d(' +
+        (pad + c * (cell + gap)) + 'px,' +
+        (pad + r * (cell + gap)) + 'px,0)';
+    }
+  }
+
+  for (var r2 = 0; r2 < size; r2++){
+    for (var c2 = 0; c2 < size; c2++){
+      var tl = G.grid[r2] && G.grid[r2][c2];
+      if (tl){
+        sizeTile(tl);
+        positionTile(tl);
+        updateTileFace(tl);
       }
-    };
-
-    const DEFAULT_THEME = { bg1: "#f7f2ff", bg2: "#edf3ff", panel: "#ffffff", accent: "#7a6af6" };
-    const game = {
-      mode: "classic",
-      size: 4,
-      target: 2048,
-      score: 0,
-      best: 0,
-      board: [],
-      obstacles: [],
-      history: [],
-      lang: "zh-Hant",
-      wonOnce: false,
-      state: "playing",
-      theme: { ...DEFAULT_THEME },
-      difficulty: "normal"
-    };
-
-    const els = {};
-    const saveSlots = Array.from({ length: 5 }, (_, i) => `slot-${i + 1}`);
-
-    function init() {
-      cacheElements();
-      initThemeFromStorage();
-      initLanguageFromStorage();
-      bindEvents();
-      applyLanguage();
-      applyTheme();
-      loadBest();
-      startNewGame();
-      renderSaveModal();
     }
+  }
+}
 
-    function cacheElements() {
-      els.modeSelect = document.getElementById("modeSelect");
-      els.customSettings = document.getElementById("customSettings");
-      els.obstacleControls = document.getElementById("obstacleControls");
-      els.customSizeSelect = document.getElementById("customSizeSelect");
-      els.customTargetSelect = document.getElementById("customTargetSelect");
-      els.difficultySelect = document.getElementById("difficultySelect");
-      els.undoBtn = document.getElementById("undoBtn");
-      els.restartBtn = document.getElementById("restartBtn");
-      els.saveBtn = document.getElementById("saveBtn");
-      els.fullscreenBtn = document.getElementById("fullscreenBtn");
-      els.langSelect = document.getElementById("langSelect");
-      els.board = document.getElementById("board");
-      els.scoreValue = document.getElementById("scoreValue");
-      els.bestValue = document.getElementById("bestValue");
-      els.targetValue = document.getElementById("targetValue");
-      els.toast = document.getElementById("toast");
-      els.saveModal = document.getElementById("saveModal");
-      els.saveList = document.getElementById("saveList");
-      els.closeSaveModal = document.getElementById("closeSaveModal");
-      els.themeBgInput = document.getElementById("themeBgInput");
-      els.themePanelInput = document.getElementById("themePanelInput");
-      els.themeAccentInput = document.getElementById("themeAccentInput");
+var lastSide = 0;
+function resize(){
+  var rect = boardWrap.getBoundingClientRect();
+  var side = Math.min(rect.width, rect.height);
+  if (side < 80) side = Math.min(window.innerWidth * 0.92, 480);
+  side = Math.max(180, side);
+  if (Math.abs(side - lastSide) < 0.5) return;
+  lastSide = side;
+  boardEl.style.width  = side + 'px';
+  boardEl.style.height = side + 'px';
+  layout(side);
+}
+
+var resizeRaf = null;
+function scheduleResize(){
+  if (resizeRaf) return;
+  resizeRaf = requestAnimationFrame(function(){
+    resizeRaf = null;
+    resize();
+  });
+}
+
+/* ==================== History / Undo ==================== */
+function updateUndoBtn(){
+  var enabled = history.length > 0 && G.running && !G.locked && !overlayEl.classList.contains('show');
+  if (G.over) enabled = history.length > 0 && !G.locked;
+  undoBtnEl.disabled = !enabled;
+}
+
+function pushHistory(){
+  var snap = {
+    grid: [],
+    score: G.score,
+    timeLeft: G.timeLeft,
+    won: G.won
+  };
+  for (var r = 0; r < G.size; r++){
+    var row = [];
+    for (var c = 0; c < G.size; c++){
+      var tl = G.grid[r][c];
+      row.push(tl ? tl.value : 0);
     }
+    snap.grid.push(row);
+  }
+  history.push(snap);
+  if (history.length > MAX_HISTORY) history.shift();
+  updateUndoBtn();
+}
 
-    function bindEvents() {
-      els.modeSelect.addEventListener("change", () => {
-        game.mode = els.modeSelect.value;
-        updateModeSettings();
-        startNewGame();
-      });
+function restoreState(snap){
+  stopTimer();
+  G.locked = false;
+  moveQueue.length = 0;
+  actionId++;
+  G.over = false;
+  G.won = snap.won;
+  G.score = snap.score;
+  G.running = true;
 
-      els.difficultySelect.addEventListener("change", () => {
-        game.difficulty = els.difficultySelect.value;
-        if (game.mode === "obstacle") startNewGame();
-      });
+  G.grid = [];
+  tileLayerEl.innerHTML = '';
 
-      els.customSizeSelect.addEventListener("change", () => { if (game.mode === "custom") startNewGame(); });
-      els.customTargetSelect.addEventListener("change", () => { if (game.mode === "custom") startNewGame(); });
-      els.undoBtn.addEventListener("click", undoMove);
-      els.restartBtn.addEventListener("click", () => { if (confirm(i18n[game.lang].restartConfirm)) startNewGame(); });
-      els.saveBtn.addEventListener("click", openSaveModal);
-      els.closeSaveModal.addEventListener("click", closeSaveModal);
-      els.langSelect.addEventListener("change", () => { game.lang = els.langSelect.value; localStorage.setItem(STORAGE_KEYS.language, game.lang); applyLanguage(); renderSaveModal(); });
-      els.fullscreenBtn.addEventListener("click", toggleFullScreen);
-
-      els.themeBgInput.addEventListener("input", () => {
-        const value = els.themeBgInput.value;
-        const [r,g,b] = hexToRgb(value);
-        const dark = [r,g,b].map(v => Math.min(255, Math.max(0, v - 12))).join(",");
-        document.documentElement.style.setProperty("--bg-1", value);
-        document.documentElement.style.setProperty("--bg-2", `rgb(${dark})`);
-        game.theme.bg1 = value;
-        game.theme.bg2 = `rgb(${dark})`;
-        persistTheme();
-      });
-
-      els.themePanelInput.addEventListener("input", () => {
-        const value = els.themePanelInput.value;
-        document.documentElement.style.setProperty("--panel", value);
-        game.theme.panel = value;
-        persistTheme();
-      });
-
-      els.themeAccentInput.addEventListener("input", () => {
-        const value = els.themeAccentInput.value;
-        document.documentElement.style.setProperty("--accent", value);
-        game.theme.accent = value;
-        persistTheme();
-      });
-
-      document.addEventListener("keydown", handleKeydown);
-      document.addEventListener("touchstart", (event) => {
-        const t = event.changedTouches[0];
-        if (t) document.__touchStart = { x: t.clientX, y: t.clientY };
-      }, { passive: true });
-      document.addEventListener("touchend", (event) => {
-        const start = document.__touchStart;
-        if (!start) return;
-        const t = event.changedTouches[0];
-        if (!t) return;
-        const dx = t.clientX - start.x;
-        const dy = t.clientY - start.y;
-        const absX = Math.abs(dx), absY = Math.abs(dy);
-        if (Math.max(absX, absY) < 26) return;
-        if (absX > absY) move(dx > 0 ? "right" : "left");
-        else move(dy > 0 ? "down" : "up");
-        delete document.__touchStart;
-      }, { passive: true });
-
-      document.addEventListener("click", (event) => {
-        const action = event.target.dataset.action;
-        if (!action) return;
-        if (action === "save-slot") saveGame(event.target.dataset.slot);
-        if (action === "load-slot") loadGame(event.target.dataset.slot);
-      });
-
-      document.addEventListener("touchmove", (event) => { if (event.cancelable) event.preventDefault(); }, { passive: false });
-      document.body.addEventListener("touchmove", (event) => { if (event.cancelable) event.preventDefault(); }, { passive: false });
-    }
-
-    function hexToRgb(hex) {
-      const clean = hex.replace("#", "");
-      const full = clean.length === 3 ? clean.split("").map(ch => ch + ch).join("") : clean;
-      const num = parseInt(full, 16);
-      return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
-    }
-
-    function initThemeFromStorage() {
-      const saved = localStorage.getItem(STORAGE_KEYS.theme);
-      if (!saved) return;
-      try { game.theme = { ...DEFAULT_THEME, ...JSON.parse(saved) }; } catch (e) { game.theme = { ...DEFAULT_THEME }; }
-    }
-
-    function persistTheme() { localStorage.setItem(STORAGE_KEYS.theme, JSON.stringify(game.theme)); }
-    function initLanguageFromStorage() {
-      const savedLang = localStorage.getItem(STORAGE_KEYS.language);
-      if (savedLang && i18n[savedLang]) game.lang = savedLang;
-    }
-
-    function loadBest() {
-      const best = Number(localStorage.getItem(STORAGE_KEYS.best) || 0);
-      game.best = Number.isFinite(best) ? best : 0;
-    }
-
-    function updateModeSettings() {
-      const isCustom = game.mode === "custom";
-      const isObstacle = game.mode === "obstacle";
-      els.customSettings.classList.toggle("hidden", !isCustom);
-      els.obstacleControls.classList.toggle("hidden", !isObstacle);
-
-      if (game.mode === "classic") {
-        game.size = 4; game.target = 2048;
-      } else if (game.mode === "obstacle") {
-        game.size = 4; game.target = 4096;
+  for (var r = 0; r < G.size; r++){
+    var row = [];
+    for (var c = 0; c < G.size; c++){
+      var v = snap.grid[r][c];
+      if (v){
+        var tl = newTile(v, r, c);
+        row.push(tl);
       } else {
-        game.size = Number(els.customSizeSelect.value || 4);
-        game.target = Number(els.customTargetSelect.value || 4096);
-      }
-
-      if (game.mode === "obstacle") {
-        game.difficulty = els.difficultySelect.value || "normal";
+        row.push(null);
       }
     }
+    G.grid.push(row);
+  }
 
-    function applyLanguage() {
-      const dict = i18n[game.lang] || i18n["zh-Hant"];
-      document.documentElement.lang = game.lang;
-      els.langSelect.value = game.lang;
-      document.querySelectorAll("[data-text]").forEach((node) => {
-        const key = node.getAttribute("data-text");
-        if (dict[key]) node.textContent = dict[key];
-      });
-      document.querySelectorAll("option[data-text]").forEach((option) => {
-        const key = option.getAttribute("data-text");
-        if (dict[key]) option.textContent = dict[key];
-      });
-      const targetValueEl = document.getElementById("targetValue");
-      if (targetValueEl) targetValueEl.textContent = String(game.target);
+  var side = lastSide || boardEl.getBoundingClientRect().width || 300;
+  layout(side);
+
+  for (var r2 = 0; r2 < G.size; r2++){
+    for (var c2 = 0; c2 < G.size; c2++){
+      if (G.grid[r2][c2]) ensureTileEl(G.grid[r2][c2], 'anim-appear');
+    }
+  }
+
+  updateScore();
+  updateUndoBtn();
+
+  if (G.timeLimit > 0){
+    var restoreTime = snap.timeLeft;
+    if (restoreTime <= 0.5) restoreTime = Math.max(20, G.timeLimit * 0.5);
+    G.timeLeft = restoreTime;
+    timerEndAt = Date.now() + restoreTime * 1000;
+    timerRowEl.classList.add('on');
+    updateTimerUI();
+    timerInterval = setInterval(timerTick, 100);
+  } else {
+    timerRowEl.classList.remove('on');
+  }
+}
+
+function undo(){
+  if (!history.length) return;
+  if (G.locked) return;
+  if (overlayEl.classList.contains('show')) return;
+  var snap = history.pop();
+  restoreState(snap);
+}
+
+/* ==================== canMove ==================== */
+function canMove(){
+  for (var r = 0; r < G.size; r++){
+    for (var c = 0; c < G.size; c++){
+      if (isBlocker(r, c)) continue;
+      var tl = G.grid[r][c];
+      if (!tl) continue;
+
+      if (c + 1 < G.size && !isBlocker(r, c + 1)){
+        var nr = G.grid[r][c + 1];
+        if (!nr) return true;
+        if (nr.value === tl.value) return true;
+      }
+      if (r + 1 < G.size && !isBlocker(r + 1, c)){
+        var nd = G.grid[r + 1][c];
+        if (!nd) return true;
+        if (nd.value === tl.value) return true;
+      }
+      if (c - 1 >= 0 && !isBlocker(r, c - 1)){
+        var nl = G.grid[r][c - 1];
+        if (!nl) return true;
+        if (nl.value === tl.value) return true;
+      }
+      if (r - 1 >= 0 && !isBlocker(r - 1, c)){
+        var nu = G.grid[r - 1][c];
+        if (!nu) return true;
+        if (nu.value === tl.value) return true;
+      }
+    }
+  }
+  return false;
+}
+
+/* ==================== Move ==================== */
+function computeMove(dir){
+  var size = G.size;
+  var newGrid = [];
+  for (var r = 0; r < size; r++) newGrid.push(G.grid[r].slice());
+
+  var moves = [];
+  var merges = [];
+  var newTiles = [];
+  var moved = false;
+  var gained = 0;
+
+  function processSegment(seg){
+    var tiles = [];
+    for (var i = 0; i < seg.length; i++){
+      var tl = G.grid[seg[i][0]][seg[i][1]];
+      if (tl) tiles.push(tl);
+    }
+    if (tiles.length === 0) return;
+
+    for (var i2 = 0; i2 < seg.length; i2++){
+      newGrid[seg[i2][0]][seg[i2][1]] = null;
     }
 
-    function applyTheme() {
-      const theme = game.theme || DEFAULT_THEME;
-      document.documentElement.style.setProperty("--bg-1", theme.bg1 || DEFAULT_THEME.bg1);
-      document.documentElement.style.setProperty("--bg-2", theme.bg2 || DEFAULT_THEME.bg2);
-      document.documentElement.style.setProperty("--panel", theme.panel || DEFAULT_THEME.panel);
-      document.documentElement.style.setProperty("--accent", theme.accent || DEFAULT_THEME.accent);
-      if (theme.bg1) els.themeBgInput.value = theme.bg1;
-      if (theme.panel) els.themePanelInput.value = theme.panel;
-      if (theme.accent) els.themeAccentInput.value = theme.accent;
-    }
+    var outIdx = 0;
+    var ti = 0;
+    while (ti < tiles.length){
+      var t1 = tiles[ti];
+      var nr = seg[outIdx][0], nc = seg[outIdx][1];
 
-    function emptyBoard(size) {
-      return Array.from({ length: size }, () => Array(size).fill(0));
-    }
-
-    function cloneBoard(board) {
-      return board.map(row => row.slice());
-    }
-
-    function getObstacleConfig() {
-      const map = { easy: 2, normal: 4, hard: 7 };
-      return map[game.difficulty] || map.normal;
-    }
-
-    function generateObstacles(size, difficulty = game.difficulty) {
-      const board = emptyBoard(size);
-      const count = Math.min(size * size - 4, { easy: 2, normal: 4, hard: 8 }[difficulty] || 4);
-      const positions = new Set();
-      const safe = new Set();
-      for (let y = 0; y < size; y++) {
-        for (let x = 0; x < size; x++) {
-          if (x < 2 && y < 2) safe.add(`${x},${y}`);
+      if (ti + 1 < tiles.length && tiles[ti+1].value === t1.value){
+        var t2 = tiles[ti+1];
+        var nv = t1.value * 2;
+        var nt = { id: G.nextId++, value: nv, row: nr, col: nc, el: null };
+        newGrid[nr][nc] = nt;
+        newTiles.push(nt);
+        merges.push({ a: t1, b: t2, row: nr, col: nc });
+        gained += nv;
+        moved = true;
+        ti += 2;
+      } else {
+        if (t1.row !== nr || t1.col !== nc){
+          moved = true;
+          moves.push({ tile: t1, row: nr, col: nc });
         }
+        newGrid[nr][nc] = t1;
+        ti += 1;
       }
-      while (positions.size < count) {
-        const x = Math.floor(Math.random() * size);
-        const y = Math.floor(Math.random() * size);
-        const key = `${x},${y}`;
-        if (safe.has(key)) continue;
-        positions.add(key);
+      outIdx++;
+    }
+  }
+
+  for (var i = 0; i < size; i++){
+    var line = [];
+    for (var j = 0; j < size; j++){
+      var rr, cc;
+      if (dir === 'left'){ rr = i; cc = j; }
+      else if (dir === 'right'){ rr = i; cc = size - 1 - j; }
+      else if (dir === 'up'){ rr = j; cc = i; }
+      else { rr = size - 1 - j; cc = i; }
+      line.push([rr, cc]);
+    }
+
+    var segStart = 0;
+    for (var k = 0; k <= line.length; k++){
+      var atEnd = (k === line.length);
+      var blocked = !atEnd && isBlocker(line[k][0], line[k][1]);
+      if (atEnd || blocked){
+        if (k > segStart) processSegment(line.slice(segStart, k));
+        segStart = k + 1;
       }
-      positions.forEach((key) => {
-        const [x, y] = key.split(",").map(Number);
-        board[y][x] = -1;
-      });
-      return board;
     }
+  }
 
-    function startNewGame() {
-      updateModeSettings();
-      const base = emptyBoard(game.size);
-      game.board = base;
-      game.obstacles = [];
-      if (game.mode === "obstacle") {
-        const obstacleBoard = generateObstacles(game.size, game.difficulty);
-        game.board = obstacleBoard;
-        game.obstacles = getObstaclePositions(game.board);
+  return { moved: moved, gained: gained, newGrid: newGrid, moves: moves, merges: merges, newTiles: newTiles };
+}
+
+function doMove(dir){
+  if (!G.running || G.over) return;
+  if (overlayEl.classList.contains('show')) return;
+
+  if (G.locked){
+    if (moveQueue.length < 2) moveQueue.push(dir);
+    return;
+  }
+
+  var res = computeMove(dir);
+  if (!res.moved){
+    if (moveQueue.length){
+      var d0 = moveQueue.shift();
+      doMove(d0);
+      return;
+    }
+    checkGameState();
+    return;
+  }
+
+  pushHistory();
+
+  G.locked = true;
+  G.score += res.gained;
+  G.grid = res.newGrid;
+  updateScore();
+  updateUndoBtn();
+  if (res.gained > 0) bumpScore();
+
+  for (var i = 0; i < res.moves.length; i++){
+    var m = res.moves[i];
+    m.tile.row = m.row;
+    m.tile.col = m.col;
+    positionTile(m.tile);
+  }
+  for (var j = 0; j < res.merges.length; j++){
+    var mg = res.merges[j];
+    mg.a.row = mg.row; mg.a.col = mg.col;
+    mg.b.row = mg.row; mg.b.col = mg.col;
+    positionTile(mg.a);
+    positionTile(mg.b);
+  }
+
+  var myActionId = ++actionId;
+  setTimeout(function(){
+    if (myActionId !== actionId) return;
+    for (var k = 0; k < res.merges.length; k++){
+      var m2 = res.merges[k];
+      if (m2.a.el){ m2.a.el.remove(); m2.a.el = null; }
+      if (m2.b.el){ m2.b.el.remove(); m2.b.el = null; }
+    }
+    for (var n = 0; n < res.newTiles.length; n++){
+      ensureTileEl(res.newTiles[n], 'anim-pop');
+    }
+    addRandomTile(true);
+
+    G.locked = false;
+    updateUndoBtn();
+
+    if (moveQueue.length){
+      var d = moveQueue.shift();
+      doMove(d);
+      return;
+    }
+    checkGameState();
+  }, MOVE_DURATION);
+}
+
+/* ==================== State checks ==================== */
+function checkGameState(){
+  if (!G.running || G.over) return;
+
+  if (!G.won && G.target > 0){
+    var hasTarget = false;
+    for (var r = 0; r < G.size && !hasTarget; r++){
+      for (var c = 0; c < G.size; c++){
+        var tl = G.grid[r][c];
+        if (tl && tl.value >= G.target){ hasTarget = true; break; }
       }
-
-      game.score = 0;
-      game.history = [];
-      game.wonOnce = false;
-      game.state = "playing";
-
-      spawnRandomTile(game.board);
-      spawnRandomTile(game.board);
-
-      els.scoreValue.textContent = "0";
-      els.bestValue.textContent = String(game.best);
-      els.targetValue.textContent = String(game.target);
-      renderBoard();
-      validateBoard();
     }
+    if (hasTarget){
+      G.won = true;
+      showWin();
+      return;
+    }
+  }
 
-    function getObstaclePositions(board) {
-      const arr = [];
-      for (let y = 0; y < board.length; y++) {
-        for (let x = 0; x < board[y].length; x++) {
-          if (board[y][x] === -1) arr.push({ x, y });
-        }
+  if (!canMove()){
+    showGameOver('over');
+  }
+}
+
+/* ==================== Score ==================== */
+function updateScore(){
+  if (scoreValEl.textContent !== String(G.score)) scoreValEl.textContent = G.score;
+  if (G.score > G.best){
+    G.best = G.score;
+    try { localStorage.setItem('g2048_best', String(G.best)); } catch(e){}
+  }
+  if (bestValEl.textContent !== String(G.best)) bestValEl.textContent = G.best;
+}
+function bumpScore(){
+  scoreBoxEl.classList.remove('bump');
+  void scoreBoxEl.offsetWidth;
+  scoreBoxEl.classList.add('bump');
+}
+
+/* ==================== Timer ==================== */
+function stopTimer(){
+  if (timerInterval){ clearInterval(timerInterval); timerInterval = null; }
+}
+function startTimer(seconds){
+  stopTimer();
+  G.timeLimit = seconds;
+  G.timeLeft = seconds;
+  timerEndAt = Date.now() + seconds * 1000;
+  timerRowEl.classList.add('on');
+  updateTimerUI();
+  timerInterval = setInterval(timerTick, 100);
+}
+function timerTick(){
+  var now = Date.now();
+  G.timeLeft = Math.max(0, (timerEndAt - now) / 1000);
+  updateTimerUI();
+  if (G.timeLeft <= 0){
+    stopTimer();
+    showGameOver('timeup');
+  }
+}
+function updateTimerUI(){
+  if (!G.timeLimit){
+    timerRowEl.classList.remove('on');
+    return;
+  }
+  timerRowEl.classList.add('on');
+  var frac = G.timeLimit > 0 ? G.timeLeft / G.timeLimit : 0;
+  if (frac < 0) frac = 0;
+  timerFillEl.style.transform = 'scaleX(' + frac + ')';
+  var cls = 'timer-fill';
+  if (frac < 0.2) cls += ' danger';
+  else if (frac < 0.5) cls += ' warn';
+  timerFillEl.className = cls;
+  timerTextEl.textContent = Math.ceil(G.timeLeft) + 's';
+}
+
+/* ==================== New game ==================== */
+function newGame(cfg){
+  stopTimer();
+  G.locked = false;
+  moveQueue.length = 0;
+  history = [];
+  actionId++;
+  G.over = false;
+  G.won = false;
+  G.running = true;
+  G.score = 0;
+  G.nextId = 1;
+
+  var size = cfg.size || 4;
+  G.size = size;
+  G.mode = cfg.mode || 'classic';
+  G.target = cfg.target || 2048;
+  G.timeLimit = cfg.timeLimit || 0;
+  G.timeLeft = G.timeLimit;
+  G.lastConfig = { size: size, target: G.target, timeLimit: G.timeLimit, blockers: cfg.blockers || 0, mode: G.mode };
+
+  G.grid = [];
+  for (var r = 0; r < size; r++){
+    var row = [];
+    for (var c = 0; c < size; c++) row.push(null);
+    G.grid.push(row);
+  }
+
+  G.blockers = [];
+  for (var r2 = 0; r2 < size; r2++){
+    var brow = [];
+    for (var c2 = 0; c2 < size; c2++) brow.push(false);
+    G.blockers.push(brow);
+  }
+
+  var cr, cc;
+  if (size % 2 === 1){
+    cr = (size - 1) / 2; cc = (size - 1) / 2;
+  } else {
+    cr = size / 2 - 1; cc = size / 2 - 1;
+  }
+  function isCenter(rr, cc2){
+    if (size % 2 === 1) return rr === cr && cc2 === cc;
+    return rr >= cr && rr <= cr + 1 && cc2 >= cc && cc2 <= cc + 1;
+  }
+
+  var maxBlockers = Math.max(0, Math.min(cfg.blockers || 0, size * size - 5));
+  var placed = 0, tries = 0;
+  while (placed < maxBlockers && tries < 400){
+    tries++;
+    var br = (Math.random() * size) | 0;
+    var bc = (Math.random() * size) | 0;
+    if (G.blockers[br][bc]) continue;
+    if (isCenter(br, bc)) continue;
+    G.blockers[br][bc] = true;
+    placed++;
+  }
+
+  tileLayerEl.innerHTML = '';
+  buildGridBg();
+  resize();
+
+  addRandomTile(true);
+  addRandomTile(true);
+
+  updateScore();
+  setModeButtons(G.mode);
+  updateUndoBtn();
+
+  if (G.timeLimit > 0){
+    startTimer(G.timeLimit);
+  } else {
+    timerRowEl.classList.remove('on');
+  }
+
+  closeOverlay();
+  checkGameState();
+}
+
+/* ==================== Mode buttons ==================== */
+function setModeButtons(mode){
+  var btns = modeBarEl.querySelectorAll('.mode-btn');
+  for (var i = 0; i < btns.length; i++){
+    btns[i].classList.toggle('active', btns[i].getAttribute('data-mode') === mode);
+  }
+}
+
+/* ==================== Theme ==================== */
+function applyTheme(name){
+  if (!THEMES[name]) name = 'classic';
+  currentTheme = name;
+  try { localStorage.setItem('g2048_theme', name); } catch(e){}
+  var vars = THEMES[name].vars;
+  for (var k in vars) document.documentElement.style.setProperty(k, vars[k]);
+  for (var r = 0; r < G.size; r++){
+    for (var c = 0; c < G.size; c++){
+      var tl = G.grid[r][c];
+      if (tl) updateTileFace(tl);
+    }
+  }
+}
+
+function buildThemeOptions(){
+  themeSelEl.innerHTML = '';
+  for (var i = 0; i < THEME_KEYS.length; i++){
+    var k = THEME_KEYS[i];
+    var opt = document.createElement('option');
+    opt.value = k;
+    opt.textContent = t(THEME_LABEL[k]);
+    themeSelEl.appendChild(opt);
+  }
+  themeSelEl.value = currentTheme;
+}
+
+/* ==================== Language ==================== */
+function applyLang(lang){
+  if (LANGS.indexOf(lang) < 0) lang = 'zh-Hant';
+  currentLang = lang;
+  try { localStorage.setItem('g2048_lang', lang); } catch(e){}
+
+  document.documentElement.lang = (lang === 'en') ? 'en' : (lang === 'zh-Hans' ? 'zh-Hans' : 'zh-Hant');
+
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++){
+    els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  }
+
+  buildThemeOptions();
+
+  langSelEl.innerHTML = '';
+  for (var j = 0; j < LANGS.length; j++){
+    var l = LANGS[j];
+    var opt = document.createElement('option');
+    opt.value = l;
+    opt.textContent = I18N[l].langName;
+    langSelEl.appendChild(opt);
+  }
+  langSelEl.value = currentLang;
+}
+
+/* ==================== Overlay ==================== */
+function closeOverlay(){
+  overlayEl.classList.remove('show');
+  overlayEl.removeAttribute('data-dismissible');
+  setTimeout(function(){
+    if (!overlayEl.classList.contains('show')) overlayEl.innerHTML = '';
+  }, 300);
+  setTimeout(updateUndoBtn, 50);
+}
+
+function showWin(){
+  var dlg = document.createElement('div');
+  dlg.className = 'dialog';
+  dlg.innerHTML =
+    '<h2>' + t('win') + '</h2>' +
+    '<div class="ov-score"><small>' + t('finalScore') + '</small>' + G.score + '</div>' +
+    '<p>' + t('winDesc', { n: G.target }) + '</p>' +
+    '<div class="dialog-btns">' +
+      '<button class="btn primary" data-act="continue">' + t('keepGoing') + '</button>' +
+      '<button class="btn" data-act="restart">' + t('restart') + '</button>' +
+    '</div>';
+  overlayEl.innerHTML = '';
+  overlayEl.appendChild(dlg);
+  overlayEl.setAttribute('data-dismissible', '0');
+  overlayEl.classList.add('show');
+  updateUndoBtn();
+
+  dlg.addEventListener('click', function(e){
+    var btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    var act = btn.getAttribute('data-act');
+    if (act === 'continue'){
+      closeOverlay();
+      setTimeout(function(){
+        if (!canMove()) showGameOver('over');
+      }, 320);
+    } else if (act === 'restart'){
+      closeOverlay();
+      newGame(G.lastConfig);
+    }
+  });
+}
+
+function showGameOver(reason){
+  G.over = true;
+  G.running = false;
+  stopTimer();
+  updateUndoBtn();
+
+  var title = t('gameOver');
+  var desc = t('overDesc');
+  if (reason === 'timeup'){ title = t('timeUp'); desc = ''; }
+
+  if (G.score > G.best){
+    G.best = G.score;
+    try { localStorage.setItem('g2048_best', String(G.best)); } catch(e){}
+    bestValEl.textContent = G.best;
+  }
+
+  var dlg = document.createElement('div');
+  dlg.className = 'dialog';
+  dlg.innerHTML =
+    '<h2>' + title + '</h2>' +
+    '<div class="ov-score"><small>' + t('finalScore') + '</small>' + G.score + '</div>' +
+    (desc ? '<p>' + desc + '</p>' : '') +
+    '<div class="dialog-btns">' +
+      '<button class="btn" data-act="undo">' + t('undo') + '</button>' +
+      '<button class="btn primary" data-act="restart">' + t('restart') + '</button>' +
+    '</div>';
+  overlayEl.innerHTML = '';
+  overlayEl.appendChild(dlg);
+  overlayEl.setAttribute('data-dismissible', '0');
+  overlayEl.classList.add('show');
+
+  dlg.addEventListener('click', function(e){
+    var btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    var act = btn.getAttribute('data-act');
+    if (act === 'restart'){
+      closeOverlay();
+      newGame(G.lastConfig);
+    } else if (act === 'undo'){
+      if (!history.length) return;
+      closeOverlay();
+      setTimeout(function(){
+        var snap = history.pop();
+        restoreState(snap);
+      }, 280);
+    }
+  });
+}
+
+/* ==================== 存档 ==================== */
+function utf8ToB64(str){
+  return btoa(unescape(encodeURIComponent(str)));
+}
+function b64ToUtf8(str){
+  return decodeURIComponent(escape(atob(str)));
+}
+
+function serialize(){
+  var data = {
+    v: 1,
+    s: G.size,
+    m: G.mode,
+    t: G.target,
+    tl: G.timeLimit,
+    tr: Math.max(0, Math.round(G.timeLeft * 10) / 10),
+    sc: G.score,
+    wo: G.won ? 1 : 0,
+    b: [],
+    g: []
+  };
+  for (var r = 0; r < G.size; r++){
+    var brow = [], grow = [];
+    for (var c = 0; c < G.size; c++){
+      brow.push(G.blockers[r][c] ? 1 : 0);
+      grow.push(G.grid[r][c] ? G.grid[r][c].value : 0);
+    }
+    data.b.push(brow);
+    data.g.push(grow);
+  }
+  var json = JSON.stringify(data);
+  return utf8ToB64(json).replace(/=+$/, '');
+}
+
+function deserialize(str){
+  str = (str || '').replace(/\s+/g, '');
+  if (!str) throw new Error('empty');
+  while (str.length % 4) str += '=';
+  var json = b64ToUtf8(str);
+  var data = JSON.parse(json);
+  if (!data || !data.g || !data.g.length) throw new Error('invalid');
+  return data;
+}
+
+function loadSnapshot(data){
+  stopTimer();
+  G.locked = false;
+  moveQueue.length = 0;
+  history = [];
+  actionId++;
+
+  G.size = Math.max(3, Math.min(8, parseInt(data.s, 10) || 4));
+  G.mode = (typeof data.m === 'string') ? data.m : 'classic';
+  G.target = parseInt(data.t, 10) || 2048;
+  G.timeLimit = parseInt(data.tl, 10) || 0;
+  G.timeLeft = Math.max(0, parseFloat(data.tr) || 0);
+  G.score = parseInt(data.sc, 10) || 0;
+  G.won = !!data.wo;
+  G.over = false;
+  G.running = true;
+  G.nextId = 1;
+
+  G.blockers = [];
+  for (var r = 0; r < G.size; r++){
+    var brow = [];
+    for (var c = 0; c < G.size; c++){
+      brow.push(!!(data.b && data.b[r] ? data.b[r][c] : 0));
+    }
+    G.blockers.push(brow);
+  }
+
+  var bCount = 0;
+  for (var r2 = 0; r2 < G.size; r2++){
+    for (var c2 = 0; c2 < G.size; c2++){
+      if (G.blockers[r2][c2]) bCount++;
+    }
+  }
+  G.lastConfig = { size: G.size, target: G.target, timeLimit: G.timeLimit, blockers: bCount, mode: G.mode };
+
+  G.grid = [];
+  for (var r3 = 0; r3 < G.size; r3++){
+    var row = [];
+    for (var c3 = 0; c3 < G.size; c3++){
+      var v = data.g && data.g[r3] ? parseInt(data.g[r3][c3], 10) || 0 : 0;
+      if (v > 0){
+        row.push(newTile(v, r3, c3));
+      } else {
+        row.push(null);
       }
-      return arr;
     }
+    G.grid.push(row);
+  }
 
-    function spawnRandomTile(board) {
-      const empties = [];
-      for (let y = 0; y < board.length; y++) {
-        for (let x = 0; x < board[y].length; x++) {
-          if (board[y][x] === 0) empties.push([x, y]);
-        }
-      }
-      if (!empties.length) return false;
-      const [x, y] = empties[Math.floor(Math.random() * empties.length)];
-      board[y][x] = Math.random() < 0.9 ? 2 : 4;
-      return true;
+  tileLayerEl.innerHTML = '';
+  buildGridBg();
+
+  var side = lastSide || boardEl.getBoundingClientRect().width || 300;
+  boardEl.style.width  = side + 'px';
+  boardEl.style.height = side + 'px';
+  layout(side);
+
+  for (var r4 = 0; r4 < G.size; r4++){
+    for (var c4 = 0; c4 < G.size; c4++){
+      if (G.grid[r4][c4]) ensureTileEl(G.grid[r4][c4], 'anim-appear');
     }
+  }
 
-    function pushHistory() {
-      game.history.push({
-        board: cloneBoard(game.board),
-        score: game.score,
-        target: game.target,
-        size: game.size,
-        mode: game.mode,
-        difficulty: game.difficulty,
-        obstacles: cloneObstacles(game.obstacles)
-      });
-      if (game.history.length > 24) game.history.shift();
+  updateScore();
+  setModeButtons(G.mode);
+  updateUndoBtn();
+  closeOverlay();
+
+  if (G.timeLimit > 0){
+    if (G.timeLeft > 0){
+      timerEndAt = Date.now() + G.timeLeft * 1000;
+      timerRowEl.classList.add('on');
+      updateTimerUI();
+      timerInterval = setInterval(timerTick, 100);
+    } else {
+      timerRowEl.classList.add('on');
+      updateTimerUI();
+      setTimeout(function(){ showGameOver('timeup'); }, 350);
+      return;
     }
+  } else {
+    timerRowEl.classList.remove('on');
+  }
 
-    function cloneObstacles(arr) {
-      return arr.map(o => ({ ...o }));
-    }
+  setTimeout(checkGameState, 250);
+}
 
-    function undoMove() {
-      const prev = game.history.pop();
-      if (!prev) { showToast(i18n[game.lang].noHistory); return; }
-      game.board = cloneBoard(prev.board);
-      game.score = prev.score;
-      game.target = prev.target;
-      game.size = prev.size;
-      game.mode = prev.mode;
-      game.difficulty = prev.difficulty || "normal";
-      game.obstacles = cloneObstacles(prev.obstacles || []);
-      game.state = "playing";
-      els.modeSelect.value = game.mode;
-      els.difficultySelect.value = game.difficulty;
-      updateModeSettings();
-      renderBoard();
-      els.scoreValue.textContent = String(game.score);
-      els.bestValue.textContent = String(game.best);
-      els.targetValue.textContent = String(game.target);
-      validateBoard();
-    }
+/* ==================== 存档对话框 ==================== */
+function openSaveDialog(){
+  var code = serialize();
+  var safeCode = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-    function renderBoard() {
-      const size = game.size;
-      els.board.style.gridTemplateColumns = `repeat(${size}, minmax(0,1fr))`;
-      els.board.innerHTML = "";
-      const cells = [];
-      for (let y = 0; y < size; y++) {
-        for (let x = 0; x < size; x++) {
-          const cell = document.createElement("div");
-          cell.className = "cell";
-          const value = game.board[y][x];
-          if (value !== 0) {
-            const tile = document.createElement("div");
-            tile.className = "tile";
-            tile.dataset.value = String(value);
-            tile.textContent = value === -1 ? "■" : value;
-            tile.style.background = value === -1 ? "linear-gradient(135deg, #8c96b2, #58657d)" : getTileColor(value);
-            tile.style.fontSize = value === -1 ? "0.8rem" : getTileFontSize(value);
-            cell.appendChild(tile);
-          }
-          cells.push(cell);
-        }
-      }
-      els.board.append(...cells);
-      els.scoreValue.textContent = String(game.score);
-      els.bestValue.textContent = String(game.best);
-      els.targetValue.textContent = String(game.target);
-    }
+  var dlg = document.createElement('div');
+  dlg.className = 'dialog';
+  dlg.innerHTML =
+    '<h2>' + t('saveTitle') + '</h2>' +
+    '<p>' + t('saveDesc') + '</p>' +
+    '<textarea class="save-code" readonly rows="4" id="saveCodeOut">' + safeCode + '</textarea>' +
+    '<div class="dialog-btns">' +
+      '<button class="btn" data-act="copy">' + t('copy') + '</button>' +
+      '<button class="btn primary" data-act="close">' + t('close') + '</button>' +
+    '</div>' +
+    '<div class="divider"></div>' +
+    '<p>' + t('loadDesc') + '</p>' +
+    '<textarea class="save-code" rows="4" id="saveCodeIn" placeholder="..."></textarea>' +
+    '<div class="dialog-btns">' +
+      '<button class="btn primary" data-act="load">' + t('loadBtn') + '</button>' +
+    '</div>';
 
-    function getTileColor(value) {
-      const palette = {
-        2: "var(--tile-2)", 4: "var(--tile-4)", 8: "var(--tile-8)", 16: "var(--tile-16)", 32: "var(--tile-32)", 64: "var(--tile-64)",
-        128: "var(--tile-128)", 256: "var(--tile-256)", 512: "var(--tile-512)", 1024: "var(--tile-1024)", 2048: "var(--tile-2048)",
-        4096: "var(--tile-4096)", 8192: "var(--tile-8192)", 16384: "var(--tile-16384)", 32768: "var(--tile-32768)", 65536: "var(--tile-65536)"
+  overlayEl.innerHTML = '';
+  overlayEl.appendChild(dlg);
+  overlayEl.setAttribute('data-dismissible', '1');
+  overlayEl.classList.add('show');
+  updateUndoBtn();
+
+  var outTa = dlg.querySelector('#saveCodeOut');
+  var inTa  = dlg.querySelector('#saveCodeIn');
+  var copyBtn = dlg.querySelector('[data-act="copy"]');
+  var loadBtn = dlg.querySelector('[data-act="load"]');
+
+  dlg.addEventListener('click', function(e){
+    var btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    var act = btn.getAttribute('data-act');
+
+    if (act === 'copy'){
+      outTa.select();
+      outTa.setSelectionRange(0, 999999);
+      var done = function(){
+        copyBtn.textContent = t('copied');
+        setTimeout(function(){ copyBtn.textContent = t('copy'); }, 1500);
       };
-      return palette[value] || "linear-gradient(135deg, #2b2f45, #101725)";
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(code).then(done).catch(function(){
+          try { document.execCommand('copy'); done(); } catch(err){}
+        });
+      } else {
+        try { document.execCommand('copy'); done(); } catch(err){}
+      }
+      return;
     }
 
-    function getTileFontSize(value) {
-      if (value >= 32768) return "clamp(0.7rem,1.4vw,1rem)";
-      if (value >= 16384) return "clamp(0.8rem,1.6vw,1.12rem)";
-      if (value >= 1024) return "clamp(0.9rem,2vw,1.35rem)";
-      if (value >= 128) return "clamp(1rem,2vw,1.65rem)";
-      if (value >= 8) return "clamp(1.1rem,2vw,1.8rem)";
-      return "clamp(1.2rem,2vw,1.9rem)";
+    if (act === 'close'){
+      closeOverlay();
+      if (G.running) setModeButtons(G.mode);
+      return;
     }
 
-    function handleKeydown(event) {
-      const map = { ArrowLeft: "left", ArrowRight: "right", ArrowUp: "up", ArrowDown: "down", a: "left", d: "right", w: "up", s: "down" };
-      const direction = map[event.key];
-      if (!direction) return;
-      event.preventDefault();
-      move(direction);
-    }
-
-    function move(direction) {
-      if (game.state === "lost") return;
-      const prev = cloneBoard(game.board);
-      const result = shiftBoard(game.board, direction);
-      if (!result.moved) {
-        if (!hasAnyMove(game.board)) finishGame();
-        else showToast(i18n[game.lang].noMoves);
+    if (act === 'load'){
+      var str = (inTa.value || '').trim();
+      if (!str) return;
+      var data;
+      try {
+        data = deserialize(str);
+      } catch(err){
+        loadBtn.textContent = t('loadError');
+        loadBtn.style.color = '#e8564a';
+        setTimeout(function(){
+          loadBtn.textContent = t('loadBtn');
+          loadBtn.style.color = '';
+        }, 1500);
         return;
       }
+      closeOverlay();
+      setTimeout(function(){ loadSnapshot(data); }, 260);
+      return;
+    }
+  });
+}
 
-      pushHistory();
-      game.board = result.board;
-      game.score += result.gained;
-      game.best = Math.max(game.best, game.score);
-      localStorage.setItem(STORAGE_KEYS.best, String(game.best));
+/* ==================== Custom dialog ==================== */
+var prevModeForCustom = 'classic';
 
-      if (game.mode === "obstacle") {
-        const cleared = clearObstaclesIfNeeded();
-        if (cleared) {
-          showToast(i18n[game.lang].goalComplete);
-        }
+function openCustomDialog(){
+  prevModeForCustom = G.mode;
+  var dlg = document.createElement('div');
+  dlg.className = 'dialog';
+
+  var sizes = [3, 4, 5, 6];
+  var targets = [512, 1024, 2048, 4096];
+  var blockerOpts = [0, 2, 4, 6];
+  var timeOpts = [0, 60, 90, 120];
+
+  function chipsHtml(field, values, activeVal, labelFn){
+    var html = '<div class="chips" data-field="' + field + '">';
+    for (var i = 0; i < values.length; i++){
+      var v = values[i];
+      html += '<button class="chip' + (v === activeVal ? ' active' : '') + '" data-val="' + v + '">' + labelFn(v) + '</button>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  var curSize = 4, curTarget = 2048, curBlockers = 0, curTime = 0;
+  if (G.lastConfig.mode === 'custom'){
+    curSize = G.lastConfig.size;
+    curTarget = G.lastConfig.target;
+    curBlockers = G.lastConfig.blockers;
+    curTime = G.lastConfig.timeLimit;
+  }
+
+  dlg.innerHTML =
+    '<h2>' + t('customTitle') + '</h2>' +
+    '<div class="field"><label>' + t('boardSize') + '</label>' +
+      chipsHtml('size', sizes, curSize, function(v){ return v + '×' + v; }) +
+    '</div>' +
+    '<div class="field"><label>' + t('target') + '</label>' +
+      chipsHtml('target', targets, curTarget, function(v){ return String(v); }) +
+    '</div>' +
+    '<div class="field"><label>' + t('blockers') + '</label>' +
+      chipsHtml('blockers', blockerOpts, curBlockers, function(v){ return v === 0 ? t('none') : String(v); }) +
+    '</div>' +
+    '<div class="field"><label>' + t('timeLimit') + '</label>' +
+      chipsHtml('time', timeOpts, curTime, function(v){ return v === 0 ? t('none') : v + 's'; }) +
+    '</div>' +
+    '<div class="dialog-btns">' +
+      '<button class="btn" data-act="cancel">' + t('cancel') + '</button>' +
+      '<button class="btn primary" data-act="start">' + t('start') + '</button>' +
+    '</div>';
+
+  overlayEl.innerHTML = '';
+  overlayEl.appendChild(dlg);
+  overlayEl.setAttribute('data-dismissible', '1');
+  overlayEl.classList.add('show');
+  updateUndoBtn();
+
+  dlg.addEventListener('click', function(e){
+    var chip = e.target.closest('.chip');
+    if (chip){
+      var group = chip.parentElement;
+      var children = group.querySelectorAll('.chip');
+      for (var i = 0; i < children.length; i++) children[i].classList.remove('active');
+      chip.classList.add('active');
+      return;
+    }
+    var btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    var act = btn.getAttribute('data-act');
+
+    if (act === 'cancel'){
+      closeOverlay();
+      setModeButtons(prevModeForCustom);
+      return;
+    }
+    if (act === 'start'){
+      function getVal(field){
+        var g = dlg.querySelector('.chips[data-field="' + field + '"] .chip.active');
+        return g ? parseInt(g.getAttribute('data-val'), 10) : 0;
       }
+      var size = getVal('size');
+      var target = getVal('target');
+      var blockers = getVal('blockers');
+      var time = getVal('time');
 
-      spawnRandomTile(game.board);
-      if (game.score >= game.target && !game.wonOnce) {
-        game.wonOnce = true;
-        showToast(i18n[game.lang].won);
-      }
-      if (!hasAnyMove(game.board)) finishGame();
-      renderBoard();
-      if (JSON.stringify(prev) === JSON.stringify(game.board)) showToast(i18n[game.lang].noMoves);
+      var maxB = Math.max(0, Math.min(blockers, size * size - 5));
+      if (maxB < blockers) blockers = maxB;
+
+      closeOverlay();
+      newGame({ size: size, target: target, timeLimit: time, blockers: blockers, mode: 'custom' });
     }
+  });
+}
 
-    function clearObstaclesIfNeeded() {
-      if (game.mode !== "obstacle") return false;
-      const before = game.obstacles.length;
-      const nextObstacles = [];
-      for (const pos of game.obstacles) {
-        const value = game.board[pos.y]?.[pos.x];
-        if (value !== -1) continue;
-        nextObstacles.push(pos);
-      }
-      game.obstacles = nextObstacles;
-      return before !== nextObstacles.length;
-    }
+/* ==================== Input ==================== */
+function onKeyDown(e){
+  var tgt = e.target;
+  if (tgt && (tgt.tagName === 'TEXTAREA' || tgt.tagName === 'INPUT' || tgt.isContentEditable)) return;
 
-    function shiftBoard(board, direction) {
-      const size = board.length;
-      let next = cloneBoard(board);
-      let moved = false;
-      let gained = 0;
-      const lines = [];
-      for (let i = 0; i < size; i++) {
-        const line = [];
-        if (direction === "left") for (let x = 0; x < size; x++) line.push({ x, y: i });
-        else if (direction === "right") for (let x = size - 1; x >= 0; x--) line.push({ x, y: i });
-        else if (direction === "up") for (let y = 0; y < size; y++) line.push({ x: i, y });
-        else if (direction === "down") for (let y = size - 1; y >= 0; y--) line.push({ x: i, y });
-        lines.push(line);
-      }
+  var k = e.key;
+  var dir = null;
+  if (k === 'ArrowLeft' || k === 'a' || k === 'A') dir = 'left';
+  else if (k === 'ArrowRight' || k === 'd' || k === 'D') dir = 'right';
+  else if (k === 'ArrowUp' || k === 'w' || k === 'W') dir = 'up';
+  else if (k === 'ArrowDown' || k === 's' || k === 'S') dir = 'down';
+  if (dir){
+    e.preventDefault();
+    doMove(dir);
+  }
+}
 
-      for (const line of lines) {
-        const actual = line.map(pos => next[pos.y][pos.x]);
-        const result = Array(size).fill(0);
-        const obstacleIndices = line.filter(pos => next[pos.y][pos.x] === -1).map(pos => line.indexOf(pos));
-        for (const pos of line) if (next[pos.y][pos.x] === -1) result[line.indexOf(pos)] = -1;
+var touchStartX = 0, touchStartY = 0, touchStartTime = 0, touchActive = false;
 
-        const order = direction === "left" || direction === "up" ? line.map(pos => pos) : [...line].reverse();
-        let currentVals = [];
-        let currentPos = [];
-        const segments = [];
-        for (const pos of order) {
-          const value = next[pos.y][pos.x];
-          if (value === -1) {
-            if (currentVals.length) {
-              segments.push({ positions: currentPos.slice(), values: currentVals.slice() });
-              currentVals = [];
-              currentPos = [];
-            }
-          } else {
-            currentVals.push(value);
-            currentPos.push(line.indexOf(pos));
-          }
-        }
-        if (currentVals.length) segments.push({ positions: currentPos.slice(), values: currentVals.slice() });
+function isInteractiveTarget(el){
+  if (!el || !el.closest) return false;
+  if (el.closest('.dialog')) return true;
+  if (el.closest('button, select, input, textarea, a, .btn, .mode-btn, .chip, .sel')) return true;
+  return false;
+}
 
-        for (const segment of segments) {
-          const processed = mergeSegment(segment.values);
-          for (let i = 0; i < segment.positions.length; i++) {
-            result[segment.positions[i]] = processed[i];
-          }
-        }
+function onTouchStart(e){
+  if (e.touches.length > 1){ touchActive = false; return; }
+  if (overlayEl.classList.contains('show')){ touchActive = false; return; }
+  if (isInteractiveTarget(e.target)){ touchActive = false; return; }
 
-        for (const pos of line) {
-          const idx = line.indexOf(pos);
-          const current = board[pos.y][pos.x];
-          const raw = result[idx];
-          if (current !== raw) moved = true;
-          next[pos.y][pos.x] = raw;
-          if (raw !== 0) gained += raw > 1 && raw !== -1 ? raw / 2 : 0;
-        }
-      }
+  touchActive = true;
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  touchStartTime = Date.now();
+}
 
-      return { board: next, moved, gained };
-    }
+function onTouchMove(e){
+  if (touchActive && e.cancelable) e.preventDefault();
+}
 
-    function mergeSegment(values) {
-      const compact = values.filter(v => v !== 0);
-      const output = [];
-      let i = 0;
-      while (i < compact.length) {
-        const current = compact[i];
-        const nextVal = compact[i + 1];
-        if (current !== 0 && nextVal === current) {
-          const merged = current * 2;
-          output.push(merged);
-          i += 2;
-        } else {
-          output.push(current);
-          i += 1;
-        }
-      }
-      while (output.length < values.length) output.push(0);
-      return output;
-    }
+function onTouchEnd(e){
+  if (!touchActive) return;
+  touchActive = false;
+  var dx = e.changedTouches[0].clientX - touchStartX;
+  var dy = e.changedTouches[0].clientY - touchStartY;
+  var dt = Date.now() - touchStartTime;
+  if (dt > 800) return;
+  var adx = Math.abs(dx), ady = Math.abs(dy);
+  if (Math.max(adx, ady) < 20) return;
+  if (adx > ady){
+    doMove(dx > 0 ? 'right' : 'left');
+  } else {
+    doMove(dy > 0 ? 'down' : 'up');
+  }
+}
 
-    function hasAnyMove(board) {
-      for (let y = 0; y < board.length; y++) {
-        for (let x = 0; x < board[y].length; x++) {
-          if (board[y][x] === 0) return true;
-          if (board[y][x] === -1) continue;
-          const right = x + 1 < board[y].length ? board[y][x + 1] : null;
-          const down = y + 1 < board.length ? board[y + 1][x] : null;
-          if ((right !== null && right !== -1 && right === board[y][x]) || (down !== null && down !== -1 && down === board[y][x])) return true;
-          if (right === 0 || down === 0) return true;
-        }
-      }
-      return false;
-    }
+/* ==================== Event wiring ==================== */
+modeBarEl.addEventListener('click', function(e){
+  var btn = e.target.closest('.mode-btn');
+  if (!btn) return;
+  var mode = btn.getAttribute('data-mode');
+  if (mode === 'custom'){ openCustomDialog(); return; }
+  var cfg;
+  if (mode === 'classic') cfg = { size:4, target:2048, timeLimit:0, blockers:0, mode:'classic' };
+  else if (mode === 'timed') cfg = { size:4, target:2048, timeLimit:90, blockers:0, mode:'timed' };
+  else cfg = { size:4, target:2048, timeLimit:0, blockers:4, mode:'blocker' };
+  newGame(cfg);
+});
 
-    function finishGame() {
-      game.state = "lost";
-      showToast(i18n[game.lang].lost);
-    }
+newBtnEl.addEventListener('click', function(){
+  if (G.mode === 'custom'){ openCustomDialog(); return; }
+  var cfg;
+  if (G.mode === 'timed') cfg = { size:4, target:2048, timeLimit:90, blockers:0, mode:'timed' };
+  else if (G.mode === 'blocker') cfg = { size:4, target:2048, timeLimit:0, blockers:4, mode:'blocker' };
+  else cfg = { size:4, target:2048, timeLimit:0, blockers:0, mode:'classic' };
+  newGame(cfg);
+});
 
-    function validateBoard() {
-      if (!Array.isArray(game.board) || game.board.length !== game.size) { game.board = emptyBoard(game.size); return; }
-      for (let y = 0; y < game.board.length; y++) {
-        if (!Array.isArray(game.board[y]) || game.board[y].length !== game.size) game.board[y] = Array(game.size).fill(0);
-        for (let x = 0; x < game.board[y].length; x++) {
-          const v = game.board[y][x];
-          if (!Number.isFinite(v) || v < -1) game.board[y][x] = 0;
-        }
-      }
-    }
+restartBtnEl.addEventListener('click', function(){
+  newGame(G.lastConfig);
+});
 
-    function showToast(msg) {
-      const toast = els.toast;
-      toast.textContent = msg;
-      toast.classList.add("visible");
-      clearTimeout(showToast.timer);
-      showToast.timer = setTimeout(() => toast.classList.remove("visible"), 1700);
-    }
+undoBtnEl.addEventListener('click', function(){
+  undo();
+});
 
-    function toggleFullScreen() {
-      if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
-      else document.exitFullscreen?.().catch(() => {});
-    }
+saveBtnEl.addEventListener('click', function(){
+  openSaveDialog();
+});
 
-    function openSaveModal() { renderSaveModal(); els.saveModal.classList.remove("hidden"); }
-    function closeSaveModal() { els.saveModal.classList.add("hidden"); }
+themeSelEl.addEventListener('change', function(){
+  applyTheme(themeSelEl.value);
+});
 
-    function renderSaveModal() {
-      const saved = getSaves();
-      const dict = i18n[game.lang] || i18n["zh-Hant"];
-      els.saveList.innerHTML = "";
-      saveSlots.forEach((slot) => {
-        const card = document.createElement("div");
-        card.className = "save-card";
-        const meta = document.createElement("div");
-        meta.className = "save-meta";
-        const title = document.createElement("strong");
-        title.textContent = `${dict.newSave} ${slot.replace("slot-", "")}`;
-        const time = document.createElement("span");
-        const saveInfo = saved[slot];
-        time.textContent = saveInfo ? new Date(saveInfo.savedAt).toLocaleString() : dict.empty;
-        meta.append(title, time);
+langSelEl.addEventListener('change', function(){
+  applyLang(langSelEl.value);
+});
 
-        const actions = document.createElement("div");
-        actions.className = "save-actions";
+overlayEl.addEventListener('click', function(e){
+  if (e.target === overlayEl && overlayEl.getAttribute('data-dismissible') === '1'){
+    closeOverlay();
+    if (G.running) setModeButtons(G.mode);
+  }
+});
 
-        const saveBtn = document.createElement("button");
-        saveBtn.className = "save-slot";
-        saveBtn.type = "button";
-        saveBtn.dataset.action = "save-slot";
-        saveBtn.dataset.slot = slot;
-        saveBtn.textContent = saveInfo ? dict.overwrite : dict.save;
+document.addEventListener('touchstart', onTouchStart, { passive: true });
+document.addEventListener('touchmove', onTouchMove, { passive: false });
+document.addEventListener('touchend', onTouchEnd, { passive: true });
+document.addEventListener('touchcancel', function(){ touchActive = false; }, { passive: true });
 
-        const loadBtn = document.createElement("button");
-        loadBtn.className = "load-slot";
-        loadBtn.type = "button";
-        loadBtn.dataset.action = "load-slot";
-        loadBtn.dataset.slot = slot;
-        loadBtn.textContent = dict.load;
-        loadBtn.disabled = !saveInfo;
-        if (!saveInfo) loadBtn.style.opacity = "0.5";
-        actions.append(saveBtn, loadBtn);
-        card.append(meta, actions);
-        els.saveList.appendChild(card);
-      });
-    }
+document.addEventListener('touchmove', function(e){
+  if (e.target.closest && e.target.closest('.dialog')) return;
+  if (e.cancelable) e.preventDefault();
+}, { passive: false });
 
-    function getSaves() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.saveSlots) || "{}") || {}; }
-      catch (e) { return {}; }
-    }
+var lastTouchEnd = 0;
+document.addEventListener('touchend', function(e){
+  var now = Date.now();
+  if (now - lastTouchEnd <= 300) e.preventDefault();
+  lastTouchEnd = now;
+}, { passive: false });
 
-    function saveGame(slot) {
-      const snapshot = {
-        board: cloneBoard(game.board),
-        score: game.score,
-        best: game.best,
-        size: game.size,
-        target: game.target,
-        mode: game.mode,
-        difficulty: game.difficulty,
-        obstacles: cloneObstacles(game.obstacles),
-        savedAt: new Date().toISOString()
-      };
-      const saves = getSaves();
-      saves[slot] = snapshot;
-      localStorage.setItem(STORAGE_KEYS.saveSlots, JSON.stringify(saves));
-      showToast(i18n[game.lang].saved);
-      renderSaveModal();
-    }
+window.addEventListener('keydown', onKeyDown, { passive: false });
 
-    function loadGame(slot) {
-      const saves = getSaves();
-      const snapshot = saves[slot];
-      if (!snapshot) return;
-      game.board = cloneBoard(snapshot.board || emptyBoard(snapshot.size || 4));
-      game.score = snapshot.score || 0;
-      game.best = snapshot.best || 0;
-      game.size = snapshot.size || 4;
-      game.target = snapshot.target || 2048;
-      game.mode = snapshot.mode || "classic";
-      game.difficulty = snapshot.difficulty || "normal";
-      game.obstacles = cloneObstacles(snapshot.obstacles || []);
-      game.history = [];
-      game.state = "playing";
-      els.modeSelect.value = game.mode;
-      els.difficultySelect.value = game.difficulty;
-      updateModeSettings();
-      localStorage.setItem(STORAGE_KEYS.best, String(game.best));
-      renderBoard();
-      closeSaveModal();
-      showToast(i18n[game.lang].loaded);
-    }
+window.addEventListener('resize', scheduleResize);
+window.addEventListener('orientationchange', function(){ setTimeout(scheduleResize, 200); });
 
-    document.addEventListener("DOMContentLoaded", init);
-  </script>
+if (typeof ResizeObserver !== 'undefined'){
+  var ro = new ResizeObserver(function(){ scheduleResize(); });
+  ro.observe(boardWrap);
+}
+
+/* ==================== Init ==================== */
+function init(){
+  applyLang(currentLang);
+  applyTheme(currentTheme);
+  requestAnimationFrame(function(){
+    resize();
+    newGame({ size:4, target:2048, timeLimit:0, blockers:0, mode:'classic' });
+  });
+}
+
+init();
+
+})();
+</script>
 </body>
 </html>
