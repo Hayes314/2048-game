@@ -2,6 +2,8 @@
 
 [Eng](README.md)
 
+連結:[https://hayes314.github.io/2048-game/](https://hayes314.github.io/2048-game/)
+
 這個2048程序在經典玩法基礎上做了不少擴展，主要特色可以歸納為以下幾個方面：
 
 **一、四種玩法模式**
