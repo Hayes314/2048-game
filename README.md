@@ -1,6 +1,6 @@
 <h1>2048 game</h1>
 
-[中文](README2.md)
+[設為中文閱讀](README2.md)
 
 link:[https://hayes314.github.io/2048-game/](https://hayes314.github.io/2048-game/)
 
