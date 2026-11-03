@@ -2,6 +2,8 @@
 
 [中文](README2.md)
 
+link:[https://hayes314.github.io/2048-game/](https://hayes314.github.io/2048-game/)
+
 This 2048 program has made a lot of expansions on the basis of the classic gameplay. The main features can be summarized in the following aspects:
 
 **I. Four modes of playing**
