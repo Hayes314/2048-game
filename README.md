@@ -2,8 +2,8 @@
 
 [点击跳转到指定位置](#README2.md)
 
-<a id="中文"></a>
-### 某个特定小节
+<a id="README2.md"></a>
+### 中文
 
 
 This 2048 program has made a lot of expansions on the basis of the classic gameplay. The main features can be summarized in the following aspects:
