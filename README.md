@@ -1,5 +1,7 @@
 <h1>2048 game</h1>
 
+[中文](docs/README2.md)
+
 This 2048 program has made a lot of expansions on the basis of the classic gameplay. The main features can be summarized in the following aspects:
 
 **I. Four modes of playing**
