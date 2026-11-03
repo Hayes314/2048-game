@@ -1,6 +1,6 @@
 <h1>2048遊戲</h1>
 
-[Eng](README.md)
+[Set to English reading](README.md)
 
 連結:[https://hayes314.github.io/2048-game/](https://hayes314.github.io/2048-game/)
 
