@@ -1,10 +1,8 @@
 <h1>2048 game</h1>
 
-[点击跳转到指定位置](#README2.md)
+[中文](#README2.md)
 
-<a id="README2.md"></a>
-### 中文
-
+<a id="2048 遊戲"></a>
 
 This 2048 program has made a lot of expansions on the basis of the classic gameplay. The main features can be summarized in the following aspects:
 
@@ -66,3 +64,4 @@ This 2048 program has made a lot of expansions on the basis of the classic gamep
 
 Overall, this is a complete version of gameplay expansion, interaction optimization and state persistence on the basis of the classic 2048, which not only retains the core feel, but also increases playability and practicality.
 
+###2048 遊戲
